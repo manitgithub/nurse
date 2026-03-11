@@ -14,6 +14,7 @@ use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\UploadedFile;
 
 class PersonnelController extends Controller
 {
@@ -50,6 +51,7 @@ class PersonnelController extends Controller
         $model = new Personnel();
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             $this->saveExpertises($model);
+            $this->handleFileUploads($model);
             Yii::$app->session->setFlash('success', 'เพิ่มข้อมูลบุคลากรสำเร็จ');
             return $this->redirect(['view', 'id' => $model->id]);
         }
@@ -64,6 +66,7 @@ class PersonnelController extends Controller
         $model = $this->findModel($id);
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             $this->saveExpertises($model);
+            $this->handleFileUploads($model);
             Yii::$app->session->setFlash('success', 'แก้ไขข้อมูลสำเร็จ');
             return $this->redirect(['view', 'id' => $model->id]);
         }
@@ -102,20 +105,40 @@ class PersonnelController extends Controller
     }
 
     /**
-     * Save expertise links from checkbox form
+     * Handle file uploads (photo, license, member card)
      */
-    protected function saveExpertises($model)
+    protected function handleFileUploads($model)
     {
-        $expertiseIds = Yii::$app->request->post('PersonnelExpertise', []);
-        // Delete old links
-        PersonnelExpertise::deleteAll(['personnel_id' => $model->id]);
-        // Insert new links
-        foreach ($expertiseIds as $eid) {
-            $pe = new PersonnelExpertise();
-            $pe->personnel_id = $model->id;
-            $pe->expertise_id = (int) $eid;
-            $pe->save();
+        $uploadDir = Yii::getAlias('@webroot') . '/uploads/personnel/' . $model->id;
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
         }
+
+        // Handle Photo (if any)
+        if ($photo = UploadedFile::getInstance($model, 'photo')) {
+            $fileName = 'photo_' . time() . '.' . $photo->extension;
+            if ($photo->saveAs($uploadDir . '/' . $fileName)) {
+                $model->photo = 'uploads/personnel/' . $model->id . '/' . $fileName;
+            }
+        }
+
+        // Handle License File
+        if ($license_file = UploadedFile::getInstance($model, 'license_file')) {
+            $fileName = 'license_' . time() . '.' . $license_file->extension;
+            if ($license_file->saveAs($uploadDir . '/' . $fileName)) {
+                $model->license_file = 'uploads/personnel/' . $model->id . '/' . $fileName;
+            }
+        }
+
+        // Handle Member Card File
+        if ($member_card_file = UploadedFile::getInstance($model, 'member_card_file')) {
+            $fileName = 'member_' . time() . '.' . $member_card_file->extension;
+            if ($member_card_file->saveAs($uploadDir . '/' . $fileName)) {
+                $model->member_card_file = 'uploads/personnel/' . $model->id . '/' . $fileName;
+            }
+        }
+
+        $model->save(false, ['photo', 'license_file', 'member_card_file']);
     }
 
     protected function findModel($id)

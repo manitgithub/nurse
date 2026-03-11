@@ -63,6 +63,9 @@ $genderLabels = \app\models\Personnel::getGenderList();
                 <?= $model->contract_end_date ?>
             </dd>
         </div>
+    </dl>
+
+    <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4 mt-8 pt-6 border-t border-gray-100">
         <div>
             <dt class="text-sm font-medium text-gray-500">คุณวุฒิ</dt>
             <dd class="text-sm text-gray-900 mt-1">
@@ -91,4 +94,64 @@ $genderLabels = \app\models\Personnel::getGenderList();
             </dd>
         </div>
     </dl>
+
+    <div class="mt-8 pt-6 border-t border-gray-100">
+        <h3 class="text-sm font-bold text-indigo-700 uppercase tracking-wider mb-4">🪪 ข้อมูลใบอนุญาตประกอบวิชาชีพ</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                <span
+                    class="block text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1">เลขที่ใบอนุญาตฯ</span>
+                <span class="text-sm font-bold text-gray-900"><?= Html::encode($model->license_no ?: '-') ?></span>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                <span
+                    class="block text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1">เลขที่สมาชิกสภาฯ</span>
+                <span
+                    class="text-sm font-bold text-gray-900"><?= Html::encode($model->council_member_no ?: '-') ?></span>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                <span
+                    class="block text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1">วันหมดอายุ</span>
+                <span
+                    class="text-sm font-bold <?= $model->license_expire_date && strtotime($model->license_expire_date) < time() ? 'text-red-500' : 'text-gray-900' ?>">
+                    <?= $model->license_expire_date ?: '-' ?>
+                    <?php if ($model->license_expire_date && strtotime($model->license_expire_date) < time()): ?>
+                        <span class="ml-2 text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded">EXPIRED</span>
+                    <?php endif; ?>
+                </span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <div>
+                <dt class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">ใบอนุญาตประกอบวิชาชีพ</dt>
+                <?php if ($model->license_file): ?>
+                    <a href="<?= \yii\helpers\Url::to('@web/' . $model->license_file) ?>" target="_blank"
+                        class="flex items-center p-3 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition group w-fit">
+                        <svg class="w-5 h-5 text-indigo-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <span class="text-sm font-bold text-indigo-700">ดูเอกสารใบอนุญาต</span>
+                    </a>
+                <?php else: ?>
+                    <span class="text-sm text-gray-400 italic">ไม่มีข้อมูลไฟล์</span>
+                <?php endif; ?>
+            </div>
+            <div>
+                <dt class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">บัตรสมาชิก</dt>
+                <?php if ($model->member_card_file): ?>
+                    <div
+                        class="relative group w-48 aspect-[3/2] overflow-hidden rounded-xl shadow-sm border border-gray-200">
+                        <img src="<?= \yii\helpers\Url::to('@web/' . $model->member_card_file) ?>"
+                            class="w-full h-full object-cover">
+                        <a href="<?= \yii\helpers\Url::to('@web/' . $model->member_card_file) ?>" target="_blank"
+                            class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition text-white text-xs font-bold">ขยายภาพ</a>
+                    </div>
+                <?php else: ?>
+                    <span class="text-sm text-gray-400 italic">ไม่มีข้อมูลภาพบัตร</span>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
 </div>

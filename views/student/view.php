@@ -115,3 +115,59 @@ $statusLabels = \app\models\Student::getStatusList();
         </tbody>
     </table>
 </div>
+<!-- Exam Results History -->
+<div class="mt-6 bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+        <h2 class="text-lg font-semibold text-gray-800">📝 ผลการสอบสภาฯ (จำลอง)</h2>
+        <span class="text-xs text-gray-400">แสดงผลคะแนนแยกตามวิชา</span>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">รอบสอบ</th>
+                    <?php 
+                    $subjectLabels = \app\models\ExamResult::getSubjectLabels();
+                    for ($i = 1; $i <= 8; $i++): ?>
+                        <th class="px-3 py-3 text-center text-xs font-semibold text-gray-500 uppercase" title="<?= Html::encode($subjectLabels["subject_{$i}"]) ?>">
+                            วิชา <?= $i ?>
+                        </th>
+                    <?php endfor; ?>
+                    <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase">สถานะ</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                <?php foreach ($examResultsProvider->getModels() as $exam): ?>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3 text-sm text-gray-900 font-medium">
+                            <?= $exam->round ? "ปี {$exam->round->year} รอบ {$exam->round->round_number}" : '-' ?>
+                        </td>
+                        <?php for ($i = 1; $i <= 8; $i++): 
+                            $attr = "subject_{$i}_score"; ?>
+                            <td class="px-3 py-3 text-sm text-center <?= (float)$exam->$attr >= 60 ? 'text-green-600 font-medium' : 'text-gray-400' ?>">
+                                <?= $exam->$attr !== null ? number_format($exam->$attr, 0) : '-' ?>
+                            </td>
+                        <?php endfor; ?>
+                        <td class="px-4 py-3 text-center">
+                            <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium <?= $exam->status === 'passed' ? 'bg-green-100 text-green-800' : ($exam->status === 'failed' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800') ?>">
+                                <?= \app\models\ExamResult::getStatusList()[$exam->status] ?? $exam->status ?>
+                            </span>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+                <?php if ($examResultsProvider->getTotalCount() == 0): ?>
+                    <tr>
+                        <td colspan="10" class="px-6 py-4 text-center text-gray-400 text-sm">ยังไม่มีข้อมูลผลสอบ</td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+    <div class="px-4 py-2 bg-gray-50 border-t border-gray-100 grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <?php for ($i = 1; $i <= 8; $i++): ?>
+            <div class="text-[10px] text-gray-500 truncate">
+                <span class="font-bold">วิชา <?= $i ?>:</span> <?= Html::encode($subjectLabels["subject_{$i}"]) ?>
+            </div>
+        <?php endfor; ?>
+    </div>
+</div>

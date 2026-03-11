@@ -27,7 +27,7 @@ class StudentGrade extends ActiveRecord
         return [
             'id' => 'ID',
             'student_id' => 'รหัสนักศึกษา',
-            'academic_year' => 'ปีการศึกษา',
+            'academic_year' => 'ภาคเรียน / ปีการศึกษา',
             'gpax' => 'GPAX',
         ];
     }

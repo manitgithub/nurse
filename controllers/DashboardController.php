@@ -79,9 +79,9 @@ class DashboardController extends Controller
         $latestPlan = AcademicRecruitmentPlan::find()->orderBy(['fiscal_year' => SORT_DESC])->one();
         $remainingQuota = $latestPlan ? $latestPlan->getRemainingQuota() : 0;
 
-        // ผลสอบใบอนุญาต
-        $licensePassed = LicenseExam::find()->where(['status' => 'passed'])->count();
-        $licenseTotal = LicenseExam::find()->count();
+        // ผลสอบใบอนุญาต (ใช้ข้อมูลจาก ExamResult แทน LicenseExam เพื่อให้ตรงกับที่บันทึกจริง)
+        $licenseTotal = ExamResult::find()->select('student_id')->distinct()->count();
+        $licensePassed = ExamResult::find()->where(['status' => 'passed'])->select('student_id')->distinct()->count();
         $licenseRate = $licenseTotal > 0 ? round($licensePassed / $licenseTotal * 100, 1) : 0;
 
         // === สถิติแยกตามข้อมูลหลัก ===

@@ -20,15 +20,15 @@ $inputClass = 'w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-5
         </div>
     </div>
 
-    <h3 class="text-lg font-semibold text-gray-800 border-b pb-2">คะแนนรายวิชา</h3>
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <?php for ($i = 1; $i <= 10; $i++):
+    <h3 class="text-lg font-semibold text-gray-800 border-b pb-2">ผลการสอบรายวิชา</h3>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <?php for ($i = 1; $i <= 8; $i++):
             $attr = "subject_{$i}_score"; ?>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">วิชาที่
-                    <?= $i ?>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    <?= \app\models\ExamResult::getSubjectLabels()["subject_{$i}"] ?>
                 </label>
-                <?= $form->field($model, $attr)->textInput(['class' => $inputClass, 'type' => 'number', 'step' => '0.01'])->label(false) ?>
+                <?= $form->field($model, $attr)->dropDownList(\app\models\ExamResult::getPassFailList(), ['class' => $inputClass, 'prompt' => '-- เลือก --'])->label(false) ?>
             </div>
         <?php endfor; ?>
     </div>

@@ -59,6 +59,71 @@ class ExpertiseController extends Controller
         return $this->redirect(['index']);
     }
 
+    /**
+     * Batch Update Personnel Expertise
+     */
+    public function actionBatchUpdate()
+    {
+        if (Yii::$app->request->isPost) {
+            $data = Yii::$app->request->post('PersonnelExpertise', []);
+            $successCount = 0;
+
+            foreach ($data as $personnelId => $expertiseIds) {
+                // Remove all current expertise for this person
+                \app\models\PersonnelExpertise::deleteAll(['personnel_id' => $personnelId]);
+
+                // Add new ones
+                if (is_array($expertiseIds)) {
+                    foreach ($expertiseIds as $eid) {
+                        if (!empty($eid)) {
+                            $pe = new \app\models\PersonnelExpertise();
+                            $pe->personnel_id = $personnelId;
+                            $pe->expertise_id = (int) $eid;
+                            $pe->save();
+                        }
+                    }
+                    $successCount++;
+                }
+            }
+
+            Yii::$app->session->setFlash('success', "ปรับปรุงความเชี่ยวชาญสำเร็จบุคลากร {$successCount} ท่าน");
+            return $this->redirect(['batch-update']);
+        }
+
+        return $this->render('batch-update');
+    }
+
+    /**
+     * AJAX: Get personnel and their expertises
+     */
+    public function actionAjaxGetPersonnel()
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $personnel = \app\models\Personnel::find()->with(['department'])->orderBy(['id' => SORT_ASC])->all();
+        $expertiseList = ArrayHelper::map(Expertise::find()->orderBy('name')->all(), 'id', 'name');
+
+        $result = [];
+        foreach ($personnel as $p) {
+            $selected = \app\models\PersonnelExpertise::find()
+                ->where(['personnel_id' => $p->id])
+                ->select(['expertise_id'])
+                ->column();
+
+            $result[] = [
+                'id' => $p->id,
+                'fullname' => $p->fullname,
+                'department_name' => $p->department->name ?? 'N/A',
+                'selected_expertises' => array_map('strval', $selected),
+            ];
+        }
+
+        return [
+            'personnel' => $result,
+            'expertiseList' => $expertiseList
+        ];
+    }
+
     protected function findModel($id)
     {
         if (($model = Expertise::findOne($id)) !== null) {

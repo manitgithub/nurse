@@ -29,12 +29,26 @@ class ExamResultController extends Controller
 
     public function actionIndex()
     {
+        $query = ExamResult::find()->with(['student', 'round']);
         $dataProvider = new ActiveDataProvider([
-            'query' => ExamResult::find()->with(['student', 'round']),
+            'query' => $query,
             'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
             'pagination' => ['pageSize' => 20],
         ]);
-        return $this->render('index', ['dataProvider' => $dataProvider]);
+
+        // Calculate statistics
+        $stats = [
+            'total' => ExamResult::find()->select('student_id')->distinct()->count(),
+            'passed' => ExamResult::find()->where(['status' => 'passed'])->select('student_id')->distinct()->count(),
+            'pending' => ExamResult::find()->where(['status' => 'pending'])->select('student_id')->distinct()->count(),
+            'failed' => ExamResult::find()->where(['status' => 'failed'])->select('student_id')->distinct()->count(),
+        ];
+        $stats['pass_rate'] = $stats['total'] > 0 ? round(($stats['passed'] / $stats['total']) * 100, 1) : 0;
+
+        return $this->render('index', [
+            'dataProvider' => $dataProvider,
+            'stats' => $stats,
+        ]);
     }
 
     public function actionView($id)
@@ -82,13 +96,21 @@ class ExamResultController extends Controller
     }
 
     /**
-     * AJAX: Get students by batch
+     * AJAX: Get students by batch (Excluding those who already passed)
      */
     public function actionGetStudents($batch)
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        // Find students who have already passed the exam
+        $passedStudentIds = ExamResult::find()
+            ->where(['status' => 'passed'])
+            ->select('student_id')
+            ->column();
+
         $students = Student::find()
             ->where(['batch' => $batch])
+            ->andWhere(['not in', 'student_id', $passedStudentIds])
             ->orderBy(['student_id' => SORT_ASC])
             ->asArray()
             ->all();
@@ -115,9 +137,9 @@ class ExamResultController extends Controller
             $transaction = Yii::$app->db->beginTransaction();
             try {
                 foreach ($results as $studentId => $data) {
-                    // Skip if all scores are empty
+                    // Skip if all subjects are empty
                     $hasData = false;
-                    for ($i = 1; $i <= 10; $i++) {
+                    for ($i = 1; $i <= 8; $i++) {
                         if (!empty($data["subject_{$i}_score"])) {
                             $hasData = true;
                             break;
@@ -134,9 +156,9 @@ class ExamResultController extends Controller
                         $model->round_id = $roundId;
                     }
 
-                    for ($i = 1; $i <= 10; $i++) {
+                    for ($i = 1; $i <= 8; $i++) {
                         $attr = "subject_{$i}_score";
-                        $model->$attr = $data[$attr] !== '' ? $data[$attr] : null;
+                        $model->$attr = !empty($data[$attr]) ? $data[$attr] : null;
                     }
                     $model->status = $data['status'] ?? null;
 

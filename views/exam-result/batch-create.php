@@ -11,7 +11,7 @@ $statusList = \app\models\ExamResult::getStatusList();
     <h1 class="text-2xl font-bold text-gray-900">📝
         <?= Html::encode($this->title) ?>
     </h1>
-    <p class="text-sm text-gray-500 mt-1">เลือกรุ่นและรอบสอบ แล้วกรอกคะแนนทีละหลายคน บันทึกทีเดียว</p>
+    <p class="text-sm text-gray-500 mt-1">เลือกรุ่นและรอบสอบ แล้วระบุผลการสอบรายวิชาของนักศึกษา</p>
 </div>
 
 <!-- Step 1: Select Batch & Round -->
@@ -89,11 +89,12 @@ $statusList = \app\models\ExamResult::getStatusList();
                             <th
                                 class="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase sticky left-32 bg-gray-50 min-w-[160px]">
                                 ชื่อ-นามสกุล</th>
-                            <?php for ($i = 1; $i <= 10; $i++): ?>
-                                <th
-                                    class="px-2 py-2 text-center text-xs font-semibold text-gray-500 uppercase min-w-[80px]">
-                                    วิชา
-                                    <?= $i ?>
+                            <?php
+                            $subjectLabels = \app\models\ExamResult::getSubjectLabels();
+                            for ($i = 1; $i <= 8; $i++): ?>
+                                <th class="px-2 py-2 text-center text-xs font-semibold text-gray-500 uppercase min-w-[80px]"
+                                    title="<?= Html::encode($subjectLabels["subject_{$i}"]) ?>">
+                                    ว.<?= $i ?>
                                 </th>
                             <?php endfor; ?>
                             <th
@@ -110,12 +111,14 @@ $statusList = \app\models\ExamResult::getStatusList();
                                     x-text="s.student_id"></td>
                                 <td class="px-3 py-2 text-sm text-gray-900 sticky left-32 bg-white" x-text="s.fullname">
                                 </td>
-                                <?php for ($i = 1; $i <= 10; $i++): ?>
+                                <?php for ($i = 1; $i <= 8; $i++): ?>
                                     <td class="px-1 py-1.5">
-                                        <input type="number" step="0.01" min="0"
-                                            :name="'ExamResult[' + s.student_id + '][subject_<?= $i ?>_score]'"
-                                            class="w-full rounded border-gray-300 px-2 py-1 text-sm border focus:border-indigo-500 focus:ring-indigo-500 text-center"
-                                            placeholder="-">
+                                        <select :name="'ExamResult[' + s.student_id + '][subject_<?= $i ?>_score]'"
+                                            class="w-full rounded border-gray-300 px-1 py-1 text-sm border focus:border-indigo-500">
+                                            <option value="">--</option>
+                                            <option value="P">ผ่าน</option>
+                                            <option value="F">ไม่ผ่าน</option>
+                                        </select>
                                     </td>
                                 <?php endfor; ?>
                                 <td class="px-1 py-1.5">

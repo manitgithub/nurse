@@ -27,10 +27,9 @@ class ExamResult extends ActiveRecord
                     'subject_6_score',
                     'subject_7_score',
                     'subject_8_score',
-                    'subject_9_score',
-                    'subject_10_score'
                 ],
-                'number'
+                'in',
+                'range' => ['P', 'F']
             ],
             [['status'], 'string', 'max' => 50],
             [['student_id'], 'exist', 'targetClass' => Student::class, 'targetAttribute' => 'student_id'],
@@ -38,22 +37,35 @@ class ExamResult extends ActiveRecord
         ];
     }
 
+    public static function getSubjectLabels()
+    {
+        return [
+            'subject_1' => 'การพยาบาลพื้นฐาน',
+            'subject_2' => 'การพยาบาลผู้ใหญ่ 1',
+            'subject_3' => 'การพยาบาลผู้ใหญ่ 2',
+            'subject_4' => 'การพยาบาลเด็กและวัยรุ่น',
+            'subject_5' => 'การพยาบาลมารดา ทารก ฯ 1',
+            'subject_6' => 'การพยาบาลมารดา ทารก ฯ 2',
+            'subject_7' => 'การพยาบาลจิตเวชและสุขภาพจิต',
+            'subject_8' => 'การพยาบาลชุมชน',
+        ];
+    }
+
     public function attributeLabels()
     {
+        $subjects = self::getSubjectLabels();
         return [
             'id' => 'ID',
             'student_id' => 'รหัสนักศึกษา',
             'round_id' => 'รอบสอบ',
-            'subject_1_score' => 'วิชาที่ 1',
-            'subject_2_score' => 'วิชาที่ 2',
-            'subject_3_score' => 'วิชาที่ 3',
-            'subject_4_score' => 'วิชาที่ 4',
-            'subject_5_score' => 'วิชาที่ 5',
-            'subject_6_score' => 'วิชาที่ 6',
-            'subject_7_score' => 'วิชาที่ 7',
-            'subject_8_score' => 'วิชาที่ 8',
-            'subject_9_score' => 'วิชาที่ 9',
-            'subject_10_score' => 'วิชาที่ 10',
+            'subject_1_score' => $subjects['subject_1'],
+            'subject_2_score' => $subjects['subject_2'],
+            'subject_3_score' => $subjects['subject_3'],
+            'subject_4_score' => $subjects['subject_4'],
+            'subject_5_score' => $subjects['subject_5'],
+            'subject_6_score' => $subjects['subject_6'],
+            'subject_7_score' => $subjects['subject_7'],
+            'subject_8_score' => $subjects['subject_8'],
             'status' => 'สถานะ',
         ];
     }
@@ -68,14 +80,24 @@ class ExamResult extends ActiveRecord
         return $this->hasOne(ExamRound::class, ['id' => 'round_id']);
     }
 
-    public function getTotalScore()
+    public function getPassedCount()
     {
-        $total = 0;
-        for ($i = 1; $i <= 10; $i++) {
+        $count = 0;
+        for ($i = 1; $i <= 8; $i++) {
             $attr = "subject_{$i}_score";
-            $total += (float) $this->$attr;
+            if ($this->$attr === 'P') {
+                $count++;
+            }
         }
-        return $total;
+        return $count;
+    }
+
+    public static function getPassFailList()
+    {
+        return [
+            'P' => 'ผ่าน',
+            'F' => 'ไม่ผ่าน',
+        ];
     }
 
     public static function getStatusList()

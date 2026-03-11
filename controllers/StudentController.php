@@ -48,10 +48,16 @@ class StudentController extends Controller
             'query' => LicenseExam::find()->where(['student_id' => $id]),
         ]);
 
+        $examResultsProvider = new ActiveDataProvider([
+            'query' => \app\models\ExamResult::find()->where(['student_id' => $id])->with(['round']),
+            'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
+        ]);
+
         return $this->render('view', [
             'model' => $model,
             'gradesProvider' => $gradesProvider,
             'licenseProvider' => $licenseProvider,
+            'examResultsProvider' => $examResultsProvider,
         ]);
     }
 

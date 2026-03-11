@@ -24,6 +24,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     <title><?= Html::encode($this->title) ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -64,6 +65,9 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                                         class="absolute left-0 mt-0 w-48 rounded-md shadow-lg bg-white ring-1 ring-black/5 hidden group-hover:block z-50">
                                         <a href="<?= \yii\helpers\Url::to(['/student/index']) ?>"
                                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">ข้อมูลนักศึกษา</a>
+                                        <a href="<?= \yii\helpers\Url::to(['/student-grade/index']) ?>"
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 font-medium text-indigo-600">ผลการเรียน
+                                            (GPAX)</a>
                                         <a href="<?= \yii\helpers\Url::to(['/exam-round/index']) ?>"
                                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">รอบสอบ</a>
                                         <a href="<?= \yii\helpers\Url::to(['/exam-result/index']) ?>"
@@ -80,6 +84,10 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                                         class="absolute left-0 mt-0 w-48 rounded-md shadow-lg bg-white ring-1 ring-black/5 hidden group-hover:block z-50">
                                         <a href="<?= \yii\helpers\Url::to(['/personnel/index']) ?>"
                                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">ข้อมูลบุคลากร</a>
+                                        <a href="<?= \yii\helpers\Url::to(['/certification/batch-create']) ?>"
+                                            class="block px-4 py-2 text-sm font-medium text-amber-600 hover:bg-amber-50 italic">
+                                            บันทึก UKPSF แบบกลุ่ม</a>
+
                                         <a href="<?= \yii\helpers\Url::to(['/scholarship/index']) ?>"
                                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">นักเรียนทุน</a>
                                         <a href="<?= \yii\helpers\Url::to(['/academic-recruitment-plan/index']) ?>"
@@ -98,11 +106,13 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">บริการวิชาการ</a>
                                         <a href="<?= \yii\helpers\Url::to(['/research/index']) ?>"
                                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">งานวิจัย</a>
+                                        <a href="<?= \yii\helpers\Url::to(['/innovation/index']) ?>"
+                                            class="block px-4 py-2 text-sm font-semibold text-indigo-600">นวัตกรรม</a>
                                     </div>
                                 </div>
 
                                 <!-- Master Data Dropdown -->
-                                <div class="relative group">
+                                <div class=" relative group">
                                     <button
                                         class="text-indigo-100 hover:bg-white/20 hover:text-white rounded-md px-3 py-2 text-sm font-medium transition">ข้อมูลหลัก
                                         ▾</button>
