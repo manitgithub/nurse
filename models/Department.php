@@ -24,7 +24,7 @@ class Department extends ActiveRecord
     {
         return [
             'id' => 'ID',
-            'name' => 'ชื่อแผนก',
+            'name' => 'ชื่อสาขา',
             'status' => 'สถานะ',
         ];
     }

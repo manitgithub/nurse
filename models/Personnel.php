@@ -19,6 +19,7 @@ class Personnel extends ActiveRecord
             [['personnel_code'], 'string', 'max' => 50],
             [['personnel_code'], 'unique'],
             [['gender'], 'string', 'max' => 10],
+            [['track'], 'string', 'max' => 20],
             [['fullname'], 'string', 'max' => 255],
             [['start_date', 'contract_end_date', 'birth_date'], 'safe'],
             [['photo'], 'string', 'max' => 500],
@@ -39,6 +40,7 @@ class Personnel extends ActiveRecord
             'id' => 'ID',
             'personnel_code' => 'รหัสบุคลากร',
             'gender' => 'เพศ',
+            'track' => 'สาย',
             'fullname' => 'ชื่อ-นามสกุล',
             'start_date' => 'วันเริ่มงาน',
             'contract_end_date' => 'วันสิ้นสุดสัญญา',
@@ -49,7 +51,7 @@ class Personnel extends ActiveRecord
             'status' => 'สถานะ',
             'qualification_id' => 'คุณวุฒิ',
             'contract_type_id' => 'ประเภทสัญญา',
-            'department_id' => 'แผนก',
+            'department_id' => 'สาขา',
         ];
     }
 
@@ -84,6 +86,14 @@ class Personnel extends ActiveRecord
         return [
             'male' => 'ชาย',
             'female' => 'หญิง',
+        ];
+    }
+
+    public static function getTrackList()
+    {
+        return [
+            'สาย ป' => 'สาย ป (ปฏิบัติการ)',
+            'สาย ว' => 'สาย ว (วิชาการ)',
         ];
     }
 }

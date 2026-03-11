@@ -3,6 +3,8 @@
 namespace app\controllers;
 
 use app\models\Personnel;
+use app\models\PersonnelExpertise;
+use app\models\Expertise;
 use app\models\Qualification;
 use app\models\ContractType;
 use app\models\Department;
@@ -47,37 +49,73 @@ class PersonnelController extends Controller
     {
         $model = new Personnel();
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            $this->saveExpertises($model);
             Yii::$app->session->setFlash('success', 'เพิ่มข้อมูลบุคลากรสำเร็จ');
             return $this->redirect(['view', 'id' => $model->id]);
         }
-        return $this->render('create', [
-            'model' => $model,
-            'qualifications' => ArrayHelper::map(Qualification::find()->where(['status' => 1])->all(), 'id', 'name'),
-            'contractTypes' => ArrayHelper::map(ContractType::find()->where(['status' => 1])->all(), 'id', 'name'),
-            'departments' => ArrayHelper::map(Department::find()->where(['status' => 1])->all(), 'id', 'name'),
-        ]);
+        return $this->render('create', array_merge(
+            ['model' => $model],
+            $this->getFormData($model)
+        ));
     }
 
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            $this->saveExpertises($model);
             Yii::$app->session->setFlash('success', 'แก้ไขข้อมูลสำเร็จ');
             return $this->redirect(['view', 'id' => $model->id]);
         }
-        return $this->render('update', [
-            'model' => $model,
-            'qualifications' => ArrayHelper::map(Qualification::find()->where(['status' => 1])->all(), 'id', 'name'),
-            'contractTypes' => ArrayHelper::map(ContractType::find()->where(['status' => 1])->all(), 'id', 'name'),
-            'departments' => ArrayHelper::map(Department::find()->where(['status' => 1])->all(), 'id', 'name'),
-        ]);
+        return $this->render('update', array_merge(
+            ['model' => $model],
+            $this->getFormData($model)
+        ));
     }
 
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+        // Delete related expertise links
+        PersonnelExpertise::deleteAll(['personnel_id' => $model->id]);
+        $model->delete();
         Yii::$app->session->setFlash('success', 'ลบข้อมูลสำเร็จ');
         return $this->redirect(['index']);
+    }
+
+    /**
+     * Get common form data (dropdowns)
+     */
+    protected function getFormData($model)
+    {
+        $selectedExpertises = ArrayHelper::getColumn(
+            PersonnelExpertise::find()->where(['personnel_id' => $model->id])->all(),
+            'expertise_id'
+        );
+        return [
+            'qualifications' => ArrayHelper::map(Qualification::find()->where(['status' => 1])->all(), 'id', 'name'),
+            'contractTypes' => ArrayHelper::map(ContractType::find()->where(['status' => 1])->all(), 'id', 'name'),
+            'departments' => ArrayHelper::map(Department::find()->where(['status' => 1])->all(), 'id', 'name'),
+            'expertiseList' => ArrayHelper::map(Expertise::find()->orderBy('name')->all(), 'id', 'name'),
+            'selectedExpertises' => $selectedExpertises,
+        ];
+    }
+
+    /**
+     * Save expertise links from checkbox form
+     */
+    protected function saveExpertises($model)
+    {
+        $expertiseIds = Yii::$app->request->post('PersonnelExpertise', []);
+        // Delete old links
+        PersonnelExpertise::deleteAll(['personnel_id' => $model->id]);
+        // Insert new links
+        foreach ($expertiseIds as $eid) {
+            $pe = new PersonnelExpertise();
+            $pe->personnel_id = $model->id;
+            $pe->expertise_id = (int) $eid;
+            $pe->save();
+        }
     }
 
     protected function findModel($id)

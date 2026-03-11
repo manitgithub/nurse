@@ -80,15 +80,26 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                                         class="absolute left-0 mt-0 w-48 rounded-md shadow-lg bg-white ring-1 ring-black/5 hidden group-hover:block z-50">
                                         <a href="<?= \yii\helpers\Url::to(['/personnel/index']) ?>"
                                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">ข้อมูลบุคลากร</a>
-                                        <a href="<?= \yii\helpers\Url::to(['/expertise/index']) ?>"
-                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">ความเชี่ยวชาญ</a>
+                                        <a href="<?= \yii\helpers\Url::to(['/scholarship/index']) ?>"
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">นักเรียนทุน</a>
+                                        <a href="<?= \yii\helpers\Url::to(['/academic-recruitment-plan/index']) ?>"
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">แผนอัตรากำลัง</a>
                                     </div>
                                 </div>
 
-                                <a href="<?= \yii\helpers\Url::to(['/scholarship/index']) ?>"
-                                    class="text-indigo-100 hover:bg-white/20 hover:text-white rounded-md px-3 py-2 text-sm font-medium transition">นักเรียนทุน</a>
-                                <a href="<?= \yii\helpers\Url::to(['/academic-recruitment-plan/index']) ?>"
-                                    class="text-indigo-100 hover:bg-white/20 hover:text-white rounded-md px-3 py-2 text-sm font-medium transition">แผนอัตรากำลัง</a>
+                                <!-- Work Dropdown -->
+                                <div class="relative group">
+                                    <button
+                                        class="text-indigo-100 hover:bg-white/20 hover:text-white rounded-md px-3 py-2 text-sm font-medium transition">ผลงาน
+                                        ▾</button>
+                                    <div
+                                        class="absolute left-0 mt-0 w-48 rounded-md shadow-lg bg-white ring-1 ring-black/5 hidden group-hover:block z-50">
+                                        <a href="<?= \yii\helpers\Url::to(['/academic-service/index']) ?>"
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">บริการวิชาการ</a>
+                                        <a href="<?= \yii\helpers\Url::to(['/research/index']) ?>"
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">งานวิจัย</a>
+                                    </div>
+                                </div>
 
                                 <!-- Master Data Dropdown -->
                                 <div class="relative group">
@@ -102,9 +113,11 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                                         <a href="<?= \yii\helpers\Url::to(['/contract-type/index']) ?>"
                                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">ประเภทสัญญา</a>
                                         <a href="<?= \yii\helpers\Url::to(['/department/index']) ?>"
-                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">แผนก</a>
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">สาขา</a>
                                         <a href="<?= \yii\helpers\Url::to(['/certification-level/index']) ?>"
                                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">ระดับใบรับรอง</a>
+                                        <a href="<?= \yii\helpers\Url::to(['/expertise/index']) ?>"
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">ความเชี่ยวชาญ</a>
                                     </div>
                                 </div>
                             </div>

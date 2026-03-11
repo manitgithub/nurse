@@ -14,7 +14,7 @@ $this->title = 'จัดการบุคลากร';
             <tr>
                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">รหัส</th>
                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">ชื่อ-นามสกุล</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">แผนก</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">สาขา</th>
                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">ประเภทสัญญา</th>
                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">สถานะ</th>
                 <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">จัดการ</th>

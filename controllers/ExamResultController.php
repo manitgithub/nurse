@@ -21,7 +21,7 @@ class ExamResultController extends Controller
                 'class' => AccessControl::class,
                 'rules' => [
                     ['allow' => true, 'actions' => ['index', 'view'], 'roles' => ['@']],
-                    ['allow' => true, 'actions' => ['create', 'update', 'delete'], 'roles' => ['@']],
+                    ['allow' => true, 'actions' => ['create', 'update', 'delete', 'batch-create', 'get-students'], 'roles' => ['@']],
                 ],
             ],
         ];
@@ -79,6 +79,89 @@ class ExamResultController extends Controller
         $this->findModel($id)->delete();
         Yii::$app->session->setFlash('success', 'ลบข้อมูลสำเร็จ');
         return $this->redirect(['index']);
+    }
+
+    /**
+     * AJAX: Get students by batch
+     */
+    public function actionGetStudents($batch)
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $students = Student::find()
+            ->where(['batch' => $batch])
+            ->orderBy(['student_id' => SORT_ASC])
+            ->asArray()
+            ->all();
+        return $students;
+    }
+
+    /**
+     * Batch create exam results for all students in a batch
+     */
+    public function actionBatchCreate()
+    {
+        $batches = Student::getBatchList();
+        $rounds = ArrayHelper::map(ExamRound::find()->orderBy(['year' => SORT_DESC, 'round_number' => SORT_DESC])->all(), 'id', function ($model) {
+            return "ปี {$model->year} รอบที่ {$model->round_number}";
+        });
+
+        if (Yii::$app->request->isPost) {
+            $post = Yii::$app->request->post();
+            $roundId = $post['round_id'] ?? null;
+            $results = $post['ExamResult'] ?? [];
+            $saved = 0;
+            $errors = [];
+
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+                foreach ($results as $studentId => $data) {
+                    // Skip if all scores are empty
+                    $hasData = false;
+                    for ($i = 1; $i <= 10; $i++) {
+                        if (!empty($data["subject_{$i}_score"])) {
+                            $hasData = true;
+                            break;
+                        }
+                    }
+                    if (!$hasData)
+                        continue;
+
+                    // Check if result already exists
+                    $model = ExamResult::findOne(['student_id' => $studentId, 'round_id' => $roundId]);
+                    if (!$model) {
+                        $model = new ExamResult();
+                        $model->student_id = $studentId;
+                        $model->round_id = $roundId;
+                    }
+
+                    for ($i = 1; $i <= 10; $i++) {
+                        $attr = "subject_{$i}_score";
+                        $model->$attr = $data[$attr] !== '' ? $data[$attr] : null;
+                    }
+                    $model->status = $data['status'] ?? null;
+
+                    if ($model->save()) {
+                        $saved++;
+                    } else {
+                        $errors[] = $studentId . ': ' . implode(', ', $model->getFirstErrors());
+                    }
+                }
+                $transaction->commit();
+                Yii::$app->session->setFlash('success', "บันทึกผลสอบสำเร็จ {$saved} รายการ");
+                if (!empty($errors)) {
+                    Yii::$app->session->setFlash('error', 'ข้อผิดพลาด: ' . implode('; ', $errors));
+                }
+                return $this->redirect(['index']);
+            } catch (\Exception $e) {
+                $transaction->rollBack();
+                Yii::$app->session->setFlash('error', 'เกิดข้อผิดพลาด: ' . $e->getMessage());
+            }
+        }
+
+        return $this->render('batch-create', [
+            'batches' => $batches,
+            'rounds' => $rounds,
+        ]);
     }
 
     protected function findModel($id)

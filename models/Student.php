@@ -16,6 +16,7 @@ class Student extends ActiveRecord
         return [
             [['student_id', 'fullname'], 'required'],
             [['student_id'], 'string', 'max' => 20],
+            [['batch'], 'string', 'max' => 10],
             [['fullname', 'high_school', 'hometown'], 'string', 'max' => 255],
             [['gpax_hs'], 'number', 'min' => 0, 'max' => 4],
             [['status'], 'string', 'max' => 50],
@@ -27,6 +28,7 @@ class Student extends ActiveRecord
     {
         return [
             'student_id' => 'รหัสนักศึกษา',
+            'batch' => 'รุ่น',
             'fullname' => 'ชื่อ-นามสกุล',
             'high_school' => 'โรงเรียนมัธยม',
             'gpax_hs' => 'GPAX มัธยม',
@@ -64,5 +66,20 @@ class Student extends ActiveRecord
             'graduated' => 'สำเร็จการศึกษา',
             'dropped' => 'พ้นสภาพ',
         ];
+    }
+
+    /**
+     * Get distinct batch list for dropdown
+     */
+    public static function getBatchList()
+    {
+        $batches = self::find()
+            ->select('batch')
+            ->distinct()
+            ->where(['not', ['batch' => null]])
+            ->andWhere(['!=', 'batch', ''])
+            ->orderBy(['batch' => SORT_DESC])
+            ->column();
+        return array_combine($batches, array_map(fn($b) => "รุ่น $b", $batches));
     }
 }

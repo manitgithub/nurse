@@ -5,6 +5,16 @@ use yii\helpers\Json;
 
 /** @var yii\web\View $this */
 $this->title = 'แดชบอร์ด — ระบบสถิติสำนักพยาบาล';
+
+// Leaflet Assets
+$this->registerCssFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css', [
+    'integrity' => 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=',
+    'crossorigin' => '',
+]);
+$this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
+    'integrity' => 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=',
+    'crossorigin' => '',
+]);
 ?>
 
 <div class="space-y-6">
@@ -24,7 +34,11 @@ $this->title = 'แดชบอร์ด — ระบบสถิติสำ�
                     <p class="text-sm text-green-600 mt-1">กำลังศึกษา: <?= $activeStudents ?></p>
                 </div>
                 <div class="bg-indigo-100 rounded-xl p-3">
-                    <svg class="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342" /></svg>
+                    <svg class="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342" />
+                    </svg>
                 </div>
             </div>
         </div>
@@ -36,7 +50,11 @@ $this->title = 'แดชบอร์ด — ระบบสถิติสำ�
                     <p class="text-sm text-green-600 mt-1">ปฏิบัติงาน: <?= $activePersonnel ?></p>
                 </div>
                 <div class="bg-emerald-100 rounded-xl p-3">
-                    <svg class="h-8 w-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" /></svg>
+                    <svg class="h-8 w-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                    </svg>
                 </div>
             </div>
         </div>
@@ -48,46 +66,80 @@ $this->title = 'แดชบอร์ด — ระบบสถิติสำ�
                     <p class="text-sm text-blue-600 mt-1">ทุนทั้งหมด</p>
                 </div>
                 <div class="bg-amber-100 rounded-xl p-3">
-                    <svg class="h-8 w-8 text-amber-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493" /></svg>
+                    <svg class="h-8 w-8 text-amber-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493" />
+                    </svg>
                 </div>
             </div>
         </div>
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-500">GPA เฉลี่ย <?= $latestYear ? "(ปี $latestYear)" : '' ?></p>
+                    <p class="text-sm font-medium text-gray-500">GPA เฉลี่ย <?= $latestYear ? "(ปี $latestYear)" : '' ?>
+                    </p>
                     <p class="text-3xl font-bold text-gray-900 mt-1"><?= number_format($avgGpax, 2) ?></p>
                     <p class="text-sm text-purple-600 mt-1">ผลการเรียนปัจจุบัน</p>
                 </div>
                 <div class="bg-purple-100 rounded-xl p-3">
-                    <svg class="h-8 w-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" /></svg>
+                    <svg class="h-8 w-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
+                    </svg>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- ===== TABS ===== -->
-    <div x-data="{ activeTab: 'students' }">
+    <div x-data="{ 
+        activeTab: 'students',
+        initMaps() {
+            if (this.activeTab === 'research' && window.researchMap) {
+                setTimeout(() => window.researchMap.invalidateSize(), 100);
+            }
+            if (this.activeTab === 'academic_service' && window.academicServiceMap) {
+                setTimeout(() => window.academicServiceMap.invalidateSize(), 100);
+            }
+        }
+    }" x-init="$watch('activeTab', value => initMaps())">
         <!-- Tab Navigation -->
         <div class="border-b border-gray-200 mb-6">
             <nav class="flex space-x-1 -mb-px" role="tablist">
-                <button @click="activeTab = 'students'" :class="activeTab === 'students' ? 'border-indigo-500 text-indigo-600 bg-indigo-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+                <button @click="activeTab = 'students'"
+                    :class="activeTab === 'students' ? 'border-indigo-500 text-indigo-600 bg-indigo-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
                     class="flex items-center px-5 py-3 border-b-2 font-semibold text-sm rounded-t-lg transition-all duration-200">
                     <span class="mr-2 text-lg">📚</span> นักศึกษา
                 </button>
-                <button @click="activeTab = 'personnel'" :class="activeTab === 'personnel' ? 'border-emerald-500 text-emerald-600 bg-emerald-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+                <button @click="activeTab = 'personnel'"
+                    :class="activeTab === 'personnel' ? 'border-emerald-500 text-emerald-600 bg-emerald-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
                     class="flex items-center px-5 py-3 border-b-2 font-semibold text-sm rounded-t-lg transition-all duration-200">
                     <span class="mr-2 text-lg">👥</span> บุคลากร
                 </button>
-                <button @click="activeTab = 'scholarship'" :class="activeTab === 'scholarship' ? 'border-amber-500 text-amber-600 bg-amber-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+                <button @click="activeTab = 'scholarship'"
+                    :class="activeTab === 'scholarship' ? 'border-amber-500 text-amber-600 bg-amber-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
                     class="flex items-center px-5 py-3 border-b-2 font-semibold text-sm rounded-t-lg transition-all duration-200">
                     <span class="mr-2 text-lg">🎓</span> ทุนการศึกษา
+                </button>
+                <button @click="activeTab = 'research'"
+                    :class="activeTab === 'research' ? 'border-indigo-500 text-indigo-600 bg-indigo-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+                    class="flex items-center px-5 py-3 border-b-2 font-semibold text-sm rounded-t-lg transition-all duration-200">
+                    <span class="mr-2 text-lg">🔬</span> งานวิจัย
+                </button>
+                <button @click="activeTab = 'academic_service'"
+                    :class="activeTab === 'academic_service' ? 'border-emerald-500 text-emerald-600 bg-emerald-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+                    class="flex items-center px-5 py-3 border-b-2 font-semibold text-sm rounded-t-lg transition-all duration-200">
+                    <span class="mr-2 text-lg">🤝</span> บริการวิชาการ
                 </button>
             </nav>
         </div>
 
         <!-- ==================== TAB: นักศึกษา ==================== -->
-        <div x-show="activeTab === 'students'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6">
+        <div x-show="activeTab === 'students'" x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0"
+            class="space-y-6">
 
             <!-- Charts Row -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -98,19 +150,23 @@ $this->title = 'แดชบอร์ด — ระบบสถิติสำ�
                         <div class="w-1/2"><canvas id="retentionChart"></canvas></div>
                         <div class="w-1/2 pl-6 space-y-3">
                             <div class="flex items-center justify-between">
-                                <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-emerald-500 mr-2"></span>กำลังศึกษา</span>
+                                <span class="flex items-center"><span
+                                        class="w-3 h-3 rounded-full bg-emerald-500 mr-2"></span>กำลังศึกษา</span>
                                 <span class="font-semibold"><?= $activeStudents ?></span>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-blue-500 mr-2"></span>สำเร็จการศึกษา</span>
+                                <span class="flex items-center"><span
+                                        class="w-3 h-3 rounded-full bg-blue-500 mr-2"></span>สำเร็จการศึกษา</span>
                                 <span class="font-semibold"><?= $graduatedStudents ?></span>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-amber-500 mr-2"></span>พักการเรียน</span>
+                                <span class="flex items-center"><span
+                                        class="w-3 h-3 rounded-full bg-amber-500 mr-2"></span>พักการเรียน</span>
                                 <span class="font-semibold"><?= $inactiveStudents ?></span>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-red-500 mr-2"></span>พ้นสภาพ</span>
+                                <span class="flex items-center"><span
+                                        class="w-3 h-3 rounded-full bg-red-500 mr-2"></span>พ้นสภาพ</span>
                                 <span class="font-semibold"><?= $droppedStudents ?></span>
                             </div>
                             <div class="pt-3 border-t">
@@ -136,8 +192,13 @@ $this->title = 'แดชบอร์ด — ระบบสถิติสำ�
                     <div class="flex items-center">
                         <div class="w-1/3"><canvas id="licenseChart"></canvas></div>
                         <div class="w-2/3 pl-6">
-                            <p class="text-sm text-gray-500">สอบผ่าน <?= $licensePassed ?> / ทั้งหมด <?= $licenseTotal ?> คน</p>
-                            <p class="text-4xl font-bold mt-2 <?= $licenseRate >= 50 ? 'text-emerald-600' : 'text-red-600' ?>"><?= $licenseRate ?>%</p>
+                            <p class="text-sm text-gray-500">สอบผ่าน <?= $licensePassed ?> / ทั้งหมด
+                                <?= $licenseTotal ?> คน
+                            </p>
+                            <p
+                                class="text-4xl font-bold mt-2 <?= $licenseRate >= 50 ? 'text-emerald-600' : 'text-red-600' ?>">
+                                <?= $licenseRate ?>%
+                            </p>
                             <p class="text-sm text-gray-400 mt-1">อัตราสอบผ่าน</p>
                         </div>
                     </div>
@@ -147,29 +208,46 @@ $this->title = 'แดชบอร์ด — ระบบสถิติสำ�
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h2 class="text-lg font-semibold text-gray-800 mb-4">แผนอัตรากำลัง</h2>
                     <?php if ($latestPlan): ?>
-                    <p class="text-sm text-gray-500 mb-3">ปีงบประมาณ <?= Html::encode($latestPlan->fiscal_year) ?></p>
-                    <div class="flex justify-between items-end mb-3">
-                        <div><p class="text-xs text-gray-500 uppercase">อัตราที่ได้รับ</p><p class="text-2xl font-bold text-gray-900"><?= $latestPlan->quota_amount ?></p></div>
-                        <div><p class="text-xs text-gray-500 uppercase">บรรจุแล้ว</p><p class="text-2xl font-bold text-blue-600"><?= $latestPlan->recruited_amount ?></p></div>
-                        <div><p class="text-xs text-gray-500 uppercase">คงเหลือ</p><p class="text-2xl font-bold <?= $remainingQuota > 0 ? 'text-emerald-600' : 'text-red-600' ?>"><?= $remainingQuota ?></p></div>
-                    </div>
-                    <?php $pct = $latestPlan->quota_amount > 0 ? round($latestPlan->recruited_amount / $latestPlan->quota_amount * 100) : 0; ?>
-                    <div class="w-full bg-gray-200 rounded-full h-3"><div class="bg-gradient-to-r from-indigo-500 to-purple-500 h-3 rounded-full" style="width: <?= min($pct, 100) ?>%"></div></div>
-                    <p class="text-sm text-gray-500 text-right mt-1"><?= $pct ?>% บรรจุแล้ว</p>
+                        <p class="text-sm text-gray-500 mb-3">ปีงบประมาณ <?= Html::encode($latestPlan->fiscal_year) ?></p>
+                        <div class="flex justify-between items-end mb-3">
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase">อัตราที่ได้รับ</p>
+                                <p class="text-2xl font-bold text-gray-900"><?= $latestPlan->quota_amount ?></p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase">บรรจุแล้ว</p>
+                                <p class="text-2xl font-bold text-blue-600"><?= $latestPlan->recruited_amount ?></p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase">คงเหลือ</p>
+                                <p
+                                    class="text-2xl font-bold <?= $remainingQuota > 0 ? 'text-emerald-600' : 'text-red-600' ?>">
+                                    <?= $remainingQuota ?>
+                                </p>
+                            </div>
+                        </div>
+                        <?php $pct = $latestPlan->quota_amount > 0 ? round($latestPlan->recruited_amount / $latestPlan->quota_amount * 100) : 0; ?>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div class="bg-gradient-to-r from-indigo-500 to-purple-500 h-3 rounded-full"
+                                style="width: <?= min($pct, 100) ?>%"></div>
+                        </div>
+                        <p class="text-sm text-gray-500 text-right mt-1"><?= $pct ?>% บรรจุแล้ว</p>
                     <?php else: ?>
-                    <p class="text-gray-400 text-sm">ยังไม่มีข้อมูลแผนอัตรากำลัง</p>
+                        <p class="text-gray-400 text-sm">ยังไม่มีข้อมูลแผนอัตรากำลัง</p>
                     <?php endif; ?>
                 </div>
             </div>
         </div>
 
         <!-- ==================== TAB: บุคลากร ==================== -->
-        <div x-show="activeTab === 'personnel'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6" style="display:none">
+        <div x-show="activeTab === 'personnel'" x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0"
+            class="space-y-6" style="display:none">
 
             <!-- Row 1: Department & Contract Type -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">🏢 บุคลากรแยกตามแผนก</h3>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">🏢 บุคลากรแยกตามสาขา</h3>
                     <?php if (!empty($personnelByDept)): ?>
                         <canvas id="deptChart" height="220"></canvas>
                     <?php else: ?>
@@ -191,21 +269,23 @@ $this->title = 'แดชบอร์ด — ระบบสถิติสำ�
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-4">📜 บุคลากรแยกตามคุณวุฒิ</h3>
                     <?php if (!empty($personnelByQualification)): ?>
-                    <div class="flex items-center">
-                        <div class="w-1/2"><canvas id="qualChart"></canvas></div>
-                        <div class="w-1/2 pl-4 space-y-2">
-                            <?php
-                            $qualColors = ['#6366f1','#8b5cf6','#a78bfa','#c4b5fd','#ddd6fe','#ede9fe'];
-                            foreach ($personnelByQualification as $i => $row):
-                                $color = $qualColors[$i % count($qualColors)];
-                            ?>
-                            <div class="flex items-center justify-between text-sm">
-                                <span class="flex items-center"><span class="w-3 h-3 rounded-full mr-2 flex-shrink-0" style="background:<?= $color ?>"></span><span class="text-gray-700 truncate"><?= Html::encode($row['label'] ?: 'ไม่ระบุ') ?></span></span>
-                                <span class="font-semibold text-gray-900 ml-2"><?= $row['total'] ?></span>
+                        <div class="flex items-center">
+                            <div class="w-1/2"><canvas id="qualChart"></canvas></div>
+                            <div class="w-1/2 pl-4 space-y-2">
+                                <?php
+                                $qualColors = ['#6366f1', '#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe', '#ede9fe'];
+                                foreach ($personnelByQualification as $i => $row):
+                                    $color = $qualColors[$i % count($qualColors)];
+                                    ?>
+                                    <div class="flex items-center justify-between text-sm">
+                                        <span class="flex items-center"><span class="w-3 h-3 rounded-full mr-2 flex-shrink-0"
+                                                style="background:<?= $color ?>"></span><span
+                                                class="text-gray-700 truncate"><?= Html::encode($row['label'] ?: 'ไม่ระบุ') ?></span></span>
+                                        <span class="font-semibold text-gray-900 ml-2"><?= $row['total'] ?></span>
+                                    </div>
+                                <?php endforeach; ?>
                             </div>
-                            <?php endforeach; ?>
                         </div>
-                    </div>
                     <?php else: ?>
                         <p class="text-gray-400 text-sm text-center py-8">ยังไม่มีข้อมูล</p>
                     <?php endif; ?>
@@ -234,8 +314,123 @@ $this->title = 'แดชบอร์ด — ระบบสถิติสำ�
             </div>
         </div>
 
+        <!-- ==================== TAB: งานวิจัย ==================== -->
+        <div x-show="activeTab === 'research'" x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0"
+            class="space-y-6" style="display:none">
+
+            <!-- Research Summary Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Research Projects -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800">🔬 โครงการวิจัย</h3>
+                        <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold">ทั้งหมด
+                            <?= $totalResearch ?></span>
+                    </div>
+                    <?php if (!empty($researchByStatus)): ?>
+                        <div class="flex items-center">
+                            <div class="w-1/2"><canvas id="researchStatusChart" height="200"></canvas></div>
+                            <div class="w-1/2 pl-6 space-y-3">
+                                <?php
+                                $statusColors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+                                foreach ($researchByStatus as $i => $row):
+                                    $color = $statusColors[$i % count($statusColors)];
+                                    ?>
+                                    <div class="flex items-center justify-between text-sm">
+                                        <span class="flex items-center">
+                                            <span class="w-3 h-3 rounded-full mr-2" style="background:<?= $color ?>"></span>
+                                            <span
+                                                class="text-gray-600 truncate"><?= Html::encode($row['label'] ?: 'ไม่ระบุ') ?></span>
+                                        </span>
+                                        <span class="font-bold text-gray-900 ml-2"><?= $row['total'] ?></span>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <p class="text-gray-400 text-sm text-center py-8">ยังไม่มีข้อมูล</p>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Funding Sources -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">💰 แหล่งทุนวิจัยยอดนิยม (TOP 5)</h3>
+                    <?php if (!empty($researchByFunding)): ?>
+                        <canvas id="researchFundingChart" height="150"></canvas>
+                    <?php else: ?>
+                        <p class="text-gray-400 text-sm text-center py-8">ยังไม่มีข้อมูล</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- Research Map -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">📍 แผนที่โครงการวิจัย</h3>
+                <div id="researchMap" class="w-full h-[400px] rounded-lg border border-gray-200 z-0"></div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB: บริการวิชาการ ==================== -->
+        <div x-show="activeTab === 'academic_service'" x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0"
+            class="space-y-6" style="display:none">
+
+            <!-- Academic Service Summary -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800">🤝 กิจกรรมบริการวิชาการ</h3>
+                        <span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold">ทั้งหมด
+                            <?= $totalAcademicService ?></span>
+                    </div>
+                    <?php if (!empty($academicServiceByStatus)): ?>
+                        <div class="flex items-center">
+                            <div class="w-1/2"><canvas id="academicServiceStatusChart" height="200"></canvas></div>
+                            <div class="w-1/2 pl-6 space-y-3">
+                                <?php
+                                $statusColors = ['#059669', '#34d399', '#6ee7b7', '#a7f3d0', '#ecfdf5'];
+                                foreach ($academicServiceByStatus as $i => $row):
+                                    $color = $statusColors[$i % count($statusColors)];
+                                    ?>
+                                    <div class="flex items-center justify-between text-sm">
+                                        <span class="flex items-center">
+                                            <span class="w-3 h-3 rounded-full mr-2" style="background:<?= $color ?>"></span>
+                                            <span
+                                                class="text-gray-600 truncate"><?= Html::encode($row['label'] ?: 'ไม่ระบุ') ?></span>
+                                        </span>
+                                        <span class="font-bold text-gray-900 ml-2"><?= $row['total'] ?></span>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <p class="text-gray-400 text-sm text-center py-8">ยังไม่มีข้อมูล</p>
+                    <?php endif; ?>
+                </div>
+
+                <div
+                    class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl shadow-lg p-8 text-white flex flex-col justify-center">
+                    <h3 class="text-lg font-medium opacity-90">จำนวนผู้เข้ารับบริการรวม</h3>
+                    <p class="text-6xl font-bold mt-4"><?= number_format($totalParticipants) ?></p>
+                    <p class="text-emerald-100 mt-2 text-sm">คน (จากทุกโครงการ)</p>
+                    <a href="<?= \yii\helpers\Url::to(['/academic-service/index']) ?>"
+                        class="inline-block mt-6 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-medium transition self-start">รายละเอียดบริการวิชาการ
+                        →</a>
+                </div>
+            </div>
+
+            <!-- Academic Service Map -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">📍 แผนที่บริการวิชาการ</h3>
+                <div id="academicServiceMap" class="w-full h-[400px] rounded-lg border border-gray-200 z-0"></div>
+            </div>
+        </div>
+
         <!-- ==================== TAB: ทุนการศึกษา ==================== -->
-        <div x-show="activeTab === 'scholarship'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6" style="display:none">
+        <div x-show="activeTab === 'scholarship'" x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0"
+            class="space-y-6" style="display:none">
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Summary Card -->
@@ -243,32 +438,36 @@ $this->title = 'แดชบอร์ด — ระบบสถิติสำ�
                     <h3 class="text-lg font-medium opacity-90">นักเรียนทุนทั้งหมด</h3>
                     <p class="text-5xl font-bold mt-3"><?= $totalScholarships ?></p>
                     <p class="text-amber-100 mt-2 text-sm">จำนวนทุนที่บันทึกในระบบ</p>
-                    <a href="<?= \yii\helpers\Url::to(['/scholarship/index']) ?>" class="inline-block mt-4 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-medium transition">ดูรายละเอียด →</a>
+                    <a href="<?= \yii\helpers\Url::to(['/scholarship/index']) ?>"
+                        class="inline-block mt-4 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-medium transition">ดูรายละเอียด
+                        →</a>
                 </div>
 
                 <!-- Scholarship by Qualification -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-4">🎓 นักเรียนทุนแยกตามระดับคุณวุฒิ</h3>
                     <?php if (!empty($scholarByQualification)): ?>
-                    <div class="space-y-3">
-                        <?php
-                        $maxScholar = max(array_column($scholarByQualification, 'total'));
-                        $barColors = ['bg-amber-500','bg-orange-500','bg-yellow-500','bg-rose-500','bg-pink-500'];
-                        foreach ($scholarByQualification as $i => $row):
-                            $pctS = $maxScholar > 0 ? round($row['total'] / $maxScholar * 100) : 0;
-                            $barColor = $barColors[$i % count($barColors)];
-                        ?>
-                        <div>
-                            <div class="flex justify-between text-sm mb-1">
-                                <span class="text-gray-700 font-medium"><?= Html::encode($row['label'] ?: 'ไม่ระบุ') ?></span>
-                                <span class="text-gray-900 font-bold"><?= $row['total'] ?> คน</span>
-                            </div>
-                            <div class="w-full bg-gray-100 rounded-full h-3">
-                                <div class="<?= $barColor ?> h-3 rounded-full transition-all duration-500" style="width:<?= $pctS ?>%"></div>
-                            </div>
+                        <div class="space-y-3">
+                            <?php
+                            $maxScholar = max(array_column($scholarByQualification, 'total'));
+                            $barColors = ['bg-amber-500', 'bg-orange-500', 'bg-yellow-500', 'bg-rose-500', 'bg-pink-500'];
+                            foreach ($scholarByQualification as $i => $row):
+                                $pctS = $maxScholar > 0 ? round($row['total'] / $maxScholar * 100) : 0;
+                                $barColor = $barColors[$i % count($barColors)];
+                                ?>
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span
+                                            class="text-gray-700 font-medium"><?= Html::encode($row['label'] ?: 'ไม่ระบุ') ?></span>
+                                        <span class="text-gray-900 font-bold"><?= $row['total'] ?> คน</span>
+                                    </div>
+                                    <div class="w-full bg-gray-100 rounded-full h-3">
+                                        <div class="<?= $barColor ?> h-3 rounded-full transition-all duration-500"
+                                            style="width:<?= $pctS ?>%"></div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
                         </div>
-                        <?php endforeach; ?>
-                    </div>
                     <?php else: ?>
                         <p class="text-gray-400 text-sm text-center py-8">ยังไม่มีข้อมูล</p>
                     <?php endif; ?>
@@ -283,105 +482,194 @@ $this->title = 'แดชบอร์ด — ระบบสถิติสำ�
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    var chartColors = ['#6366f1','#8b5cf6','#ec4899','#f59e0b','#10b981','#06b6d4','#f43f5e','#84cc16','#14b8a6','#a855f7'];
+    document.addEventListener('DOMContentLoaded', function () {
+        var chartColors = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4', '#f43f5e', '#84cc16', '#14b8a6', '#a855f7'];
 
-    // ===== STUDENT TAB CHARTS =====
+        // ===== STUDENT TAB CHARTS =====
 
-    // Retention Doughnut
-    new Chart(document.getElementById('retentionChart'), {
-        type: 'doughnut',
-        data: {
-            labels: ['กำลังศึกษา','สำเร็จการศึกษา','พักการเรียน','พ้นสภาพ'],
-            datasets: [{
-                data: [<?= $activeStudents ?>,<?= $graduatedStudents ?>,<?= $inactiveStudents ?>,<?= $droppedStudents ?>],
-                backgroundColor: ['#10b981','#3b82f6','#f59e0b','#ef4444'],
-                borderWidth: 0, hoverOffset: 8,
-            }]
-        },
-        options: { cutout: '65%', plugins: { legend: { display: false } }, responsive: true }
+        // Retention Doughnut
+        new Chart(document.getElementById('retentionChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['กำลังศึกษา', 'สำเร็จการศึกษา', 'พักการเรียน', 'พ้นสภาพ'],
+                datasets: [{
+                    data: [<?= $activeStudents ?>, <?= $graduatedStudents ?>, <?= $inactiveStudents ?>, <?= $droppedStudents ?>],
+                    backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'],
+                    borderWidth: 0, hoverOffset: 8,
+                }]
+            },
+            options: { cutout: '65%', plugins: { legend: { display: false } }, responsive: true }
+        });
+
+        // GPAX Line
+        new Chart(document.getElementById('gpaxChart'), {
+            type: 'line',
+            data: {
+                labels: <?= Json::encode(array_keys($gpaxByYear)) ?>,
+                datasets: [{
+                    label: 'GPAX เฉลี่ย',
+                    data: <?= Json::encode(array_values($gpaxByYear)) ?>,
+                    borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.1)',
+                    tension: 0.4, fill: true, pointBackgroundColor: '#6366f1', pointRadius: 5, pointHoverRadius: 7,
+                }]
+            },
+            options: { responsive: true, scales: { y: { min: 0, max: 4, ticks: { stepSize: 0.5 } } }, plugins: { legend: { display: false } } }
+        });
+
+        // License Doughnut
+        new Chart(document.getElementById('licenseChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['สอบผ่าน', 'ยังไม่ผ่าน'],
+                datasets: [{ data: [<?= $licensePassed ?>, <?= max(0, $licenseTotal - $licensePassed) ?>], backgroundColor: ['#10b981', '#e5e7eb'], borderWidth: 0 }]
+            },
+            options: { cutout: '70%', plugins: { legend: { display: false } }, responsive: true }
+        });
+
+        // ===== PERSONNEL TAB CHARTS =====
+
+        <?php if (!empty($personnelByDept)): ?>
+            new Chart(document.getElementById('deptChart'), {
+                type: 'bar',
+                data: {
+                    labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $personnelByDept)) ?>,
+                    datasets: [{ label: 'จำนวน', data: <?= Json::encode(array_map(fn($r) => (int) $r['total'], $personnelByDept)) ?>, backgroundColor: chartColors, borderRadius: 8, borderSkipped: false }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+            });
+        <?php endif; ?>
+
+        <?php if (!empty($personnelByContract)): ?>
+            new Chart(document.getElementById('contractChart'), {
+                type: 'bar',
+                data: {
+                    labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $personnelByContract)) ?>,
+                    datasets: [{ label: 'จำนวน', data: <?= Json::encode(array_map(fn($r) => (int) $r['total'], $personnelByContract)) ?>, backgroundColor: ['#6366f1', '#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe'], borderRadius: 8, borderSkipped: false }]
+                },
+                options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+            });
+        <?php endif; ?>
+
+        <?php if (!empty($personnelByQualification)): ?>
+            new Chart(document.getElementById('qualChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $personnelByQualification)) ?>,
+                    datasets: [{ data: <?= Json::encode(array_map(fn($r) => (int) $r['total'], $personnelByQualification)) ?>, backgroundColor: ['#6366f1', '#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe', '#ede9fe'], borderWidth: 0, hoverOffset: 6 }]
+                },
+                options: { cutout: '60%', plugins: { legend: { display: false } }, responsive: true }
+            });
+        <?php endif; ?>
+
+        <?php if (!empty($certByLevel)): ?>
+            new Chart(document.getElementById('certChart'), {
+                type: 'bar',
+                data: {
+                    labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $certByLevel)) ?>,
+                    datasets: [{ label: 'จำนวน', data: <?= Json::encode(array_map(fn($r) => (int) $r['total'], $certByLevel)) ?>, backgroundColor: ['#f59e0b', '#f97316', '#ef4444', '#ec4899', '#8b5cf6'], borderRadius: 8, borderSkipped: false }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+            });
+        <?php endif; ?>
+
+        <?php if (!empty($topExpertises)): ?>
+            new Chart(document.getElementById('expertiseChart'), {
+                type: 'bar',
+                data: {
+                    labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $topExpertises)) ?>,
+                    datasets: [{ label: 'จำนวนบุคลากร', data: <?= Json::encode(array_map(fn($r) => (int) $r['total'], $topExpertises)) ?>, backgroundColor: chartColors, borderRadius: 8, borderSkipped: false }]
+                },
+                options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+            });
+        <?php endif; ?>
+
+        // ===== WORK TAB CHARTS =====
+
+        <?php if (!empty($researchByStatus)): ?>
+            new Chart(document.getElementById('researchStatusChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $researchByStatus)) ?>,
+                    datasets: [{
+                        data: <?= Json::encode(array_map(fn($r) => (int) $r['total'], $researchByStatus)) ?>,
+                        backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
+                        borderWidth: 0, hoverOffset: 6,
+                    }]
+                },
+                options: { cutout: '60%', plugins: { legend: { display: false } }, responsive: true }
+            });
+        <?php endif; ?>
+
+        <?php if (!empty($academicServiceByStatus)): ?>
+            new Chart(document.getElementById('academicServiceStatusChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $academicServiceByStatus)) ?>,
+                    datasets: [{
+                        data: <?= Json::encode(array_map(fn($r) => (int) $r['total'], $academicServiceByStatus)) ?>,
+                        backgroundColor: ['#059669', '#34d399', '#6ee7b7', '#a7f3d0', '#ecfdf5'],
+                        borderWidth: 0, hoverOffset: 6,
+                    }]
+                },
+                options: { cutout: '60%', plugins: { legend: { display: false } }, responsive: true }
+            });
+        <?php endif; ?>
+
+        <?php if (!empty($researchByFunding)): ?>
+            new Chart(document.getElementById('researchFundingChart'), {
+                type: 'bar',
+                data: {
+                    labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $researchByFunding)) ?>,
+                    datasets: [{ label: 'จำนวนโครงการ', data: <?= Json::encode(array_map(fn($r) => (int) $r['total'], $researchByFunding)) ?>, backgroundColor: '#6366f1', borderRadius: 8 }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+            });
+        <?php endif; ?>
+
+        // ===== MAPS INITIALIZATION =====
+
+        // Research Map
+        var researchLocations = <?= Json::encode($researchLocations) ?>;
+        if (researchLocations.length > 0) {
+            window.researchMap = L.map('researchMap').setView([13.7367, 100.5231], 6); // Default to Thailand center
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(window.researchMap);
+
+            var researchGroup = L.featureGroup();
+            researchLocations.forEach(function (loc) {
+                if (loc.latitude && loc.longitude) {
+                    var marker = L.marker([loc.latitude, loc.longitude])
+                        .bindPopup('<b>' + loc.title + '</b>')
+                        .addTo(researchGroup);
+                }
+            });
+            researchGroup.addTo(window.researchMap);
+            if (researchGroup.getBounds().isValid()) {
+                window.researchMap.fitBounds(researchGroup.getBounds(), { padding: [20, 20] });
+            }
+        }
+
+        // Academic Service Map
+        var academicLocations = <?= Json::encode($academicServiceLocations) ?>;
+        if (academicLocations.length > 0) {
+            window.academicServiceMap = L.map('academicServiceMap').setView([13.7367, 100.5231], 6);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(window.academicServiceMap);
+
+            var academicGroup = L.featureGroup();
+            academicLocations.forEach(function (loc) {
+                if (loc.latitude && loc.longitude) {
+                    var marker = L.marker([loc.latitude, loc.longitude])
+                        .bindPopup('<b>' + loc.activity_name + '</b>')
+                        .addTo(academicGroup);
+                }
+            });
+            academicGroup.addTo(window.academicServiceMap);
+            if (academicGroup.getBounds().isValid()) {
+                window.academicServiceMap.fitBounds(academicGroup.getBounds(), { padding: [20, 20] });
+            }
+        }
     });
-
-    // GPAX Line
-    new Chart(document.getElementById('gpaxChart'), {
-        type: 'line',
-        data: {
-            labels: <?= Json::encode(array_keys($gpaxByYear)) ?>,
-            datasets: [{
-                label: 'GPAX เฉลี่ย',
-                data: <?= Json::encode(array_values($gpaxByYear)) ?>,
-                borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.1)',
-                tension: 0.4, fill: true, pointBackgroundColor: '#6366f1', pointRadius: 5, pointHoverRadius: 7,
-            }]
-        },
-        options: { responsive: true, scales: { y: { min: 0, max: 4, ticks: { stepSize: 0.5 } } }, plugins: { legend: { display: false } } }
-    });
-
-    // License Doughnut
-    new Chart(document.getElementById('licenseChart'), {
-        type: 'doughnut',
-        data: {
-            labels: ['สอบผ่าน','ยังไม่ผ่าน'],
-            datasets: [{ data: [<?= $licensePassed ?>,<?= max(0, $licenseTotal - $licensePassed) ?>], backgroundColor: ['#10b981','#e5e7eb'], borderWidth: 0 }]
-        },
-        options: { cutout: '70%', plugins: { legend: { display: false } }, responsive: true }
-    });
-
-    // ===== PERSONNEL TAB CHARTS =====
-
-    <?php if (!empty($personnelByDept)): ?>
-    new Chart(document.getElementById('deptChart'), {
-        type: 'bar',
-        data: {
-            labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $personnelByDept)) ?>,
-            datasets: [{ label: 'จำนวน', data: <?= Json::encode(array_map(fn($r) => (int)$r['total'], $personnelByDept)) ?>, backgroundColor: chartColors, borderRadius: 8, borderSkipped: false }]
-        },
-        options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
-    });
-    <?php endif; ?>
-
-    <?php if (!empty($personnelByContract)): ?>
-    new Chart(document.getElementById('contractChart'), {
-        type: 'bar',
-        data: {
-            labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $personnelByContract)) ?>,
-            datasets: [{ label: 'จำนวน', data: <?= Json::encode(array_map(fn($r) => (int)$r['total'], $personnelByContract)) ?>, backgroundColor: ['#6366f1','#8b5cf6','#a78bfa','#c4b5fd','#ddd6fe'], borderRadius: 8, borderSkipped: false }]
-        },
-        options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } } }
-    });
-    <?php endif; ?>
-
-    <?php if (!empty($personnelByQualification)): ?>
-    new Chart(document.getElementById('qualChart'), {
-        type: 'doughnut',
-        data: {
-            labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $personnelByQualification)) ?>,
-            datasets: [{ data: <?= Json::encode(array_map(fn($r) => (int)$r['total'], $personnelByQualification)) ?>, backgroundColor: ['#6366f1','#8b5cf6','#a78bfa','#c4b5fd','#ddd6fe','#ede9fe'], borderWidth: 0, hoverOffset: 6 }]
-        },
-        options: { cutout: '60%', plugins: { legend: { display: false } }, responsive: true }
-    });
-    <?php endif; ?>
-
-    <?php if (!empty($certByLevel)): ?>
-    new Chart(document.getElementById('certChart'), {
-        type: 'bar',
-        data: {
-            labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $certByLevel)) ?>,
-            datasets: [{ label: 'จำนวน', data: <?= Json::encode(array_map(fn($r) => (int)$r['total'], $certByLevel)) ?>, backgroundColor: ['#f59e0b','#f97316','#ef4444','#ec4899','#8b5cf6'], borderRadius: 8, borderSkipped: false }]
-        },
-        options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
-    });
-    <?php endif; ?>
-
-    <?php if (!empty($topExpertises)): ?>
-    new Chart(document.getElementById('expertiseChart'), {
-        type: 'bar',
-        data: {
-            labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $topExpertises)) ?>,
-            datasets: [{ label: 'จำนวนบุคลากร', data: <?= Json::encode(array_map(fn($r) => (int)$r['total'], $topExpertises)) ?>, backgroundColor: chartColors, borderRadius: 8, borderSkipped: false }]
-        },
-        options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } } }
-    });
-    <?php endif; ?>
-});
 </script>

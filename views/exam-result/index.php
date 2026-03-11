@@ -6,6 +6,7 @@ $this->title = 'ผลสอบ';
     <h1 class="text-2xl font-bold text-gray-900">📝
         <?= Html::encode($this->title) ?>
     </h1>
+    <?= Html::a('📋 บันทึกแบบกลุ่ม', ['batch-create'], ['class' => 'bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-4 rounded-lg shadow-sm transition']) ?>
     <?= Html::a('+ เพิ่มผลสอบ', ['create'], ['class' => 'bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg shadow-sm transition']) ?>
 </div>
 <div class="bg-white shadow-sm rounded-xl overflow-hidden border border-gray-200">

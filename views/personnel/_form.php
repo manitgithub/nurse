@@ -9,21 +9,23 @@ $inputClass = 'w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-5
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">รหัสบุคลากร <span
-                    class="text-red-500">*</span></label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">รหัสบุคลากร <span class="text-red-500">*</span></label>
             <?= $form->field($model, 'personnel_code')->textInput(['class' => $inputClass])->label(false) ?>
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อ-นามสกุล <span
-                    class="text-red-500">*</span></label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อ-นามสกุล <span class="text-red-500">*</span></label>
             <?= $form->field($model, 'fullname')->textInput(['class' => $inputClass])->label(false) ?>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">เพศ</label>
             <?= $form->field($model, 'gender')->dropDownList(\app\models\Personnel::getGenderList(), ['class' => $inputClass, 'prompt' => '-- เลือก --'])->label(false) ?>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">สาย</label>
+            <?= $form->field($model, 'track')->dropDownList(\app\models\Personnel::getTrackList(), ['class' => $inputClass, 'prompt' => '-- เลือก --'])->label(false) ?>
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">อีเมล</label>
@@ -60,7 +62,7 @@ $inputClass = 'w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-5
             <?= $form->field($model, 'contract_type_id')->dropDownList($contractTypes, ['class' => $inputClass, 'prompt' => '-- เลือก --'])->label(false) ?>
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">แผนก</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">สาขา</label>
             <?= $form->field($model, 'department_id')->dropDownList($departments, ['class' => $inputClass, 'prompt' => '-- เลือก --'])->label(false) ?>
         </div>
     </div>
@@ -69,6 +71,23 @@ $inputClass = 'w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-5
         <label class="block text-sm font-medium text-gray-700 mb-1">สถานะ</label>
         <?= $form->field($model, 'status')->dropDownList([1 => 'ปฏิบัติงาน', 0 => 'ไม่ปฏิบัติงาน'], ['class' => $inputClass])->label(false) ?>
     </div>
+
+    <!-- ความเชี่ยวชาญ -->
+    <?php if (!empty($expertiseList)): ?>
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">🔬 ความเชี่ยวชาญ</label>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 bg-gray-50 rounded-lg p-4 border">
+            <?php foreach ($expertiseList as $eid => $ename): ?>
+            <label class="flex items-center space-x-2 cursor-pointer hover:bg-white rounded px-2 py-1.5 transition">
+                <input type="checkbox" name="PersonnelExpertise[]" value="<?= $eid ?>"
+                    <?= in_array($eid, $selectedExpertises ?? []) ? 'checked' : '' ?>
+                    class="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                <span class="text-sm text-gray-700"><?= Html::encode($ename) ?></span>
+            </label>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <?php endif; ?>
 
     <div class="flex justify-end space-x-3 pt-4 border-t">
         <?= Html::a('ยกเลิก', ['index'], ['class' => 'px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition']) ?>

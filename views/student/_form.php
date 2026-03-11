@@ -11,11 +11,16 @@ use yii\widgets\ActiveForm;
     <div class="bg-white shadow-sm rounded-xl p-6 border border-gray-200">
         <?php $form = ActiveForm::begin(['options' => ['class' => 'space-y-4']]); ?>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">รหัสนักศึกษา <span
                         class="text-red-500">*</span></label>
                 <?= $form->field($model, 'student_id')->textInput(['class' => 'w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-3 py-2 border', 'maxlength' => true])->label(false) ?>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">รุ่น <span
+                        class="text-red-500">*</span></label>
+                <?= $form->field($model, 'batch')->textInput(['class' => 'w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-3 py-2 border', 'placeholder' => 'เช่น 69', 'maxlength' => true])->label(false) ?>
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อ-นามสกุล <span

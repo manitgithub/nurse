@@ -76,7 +76,7 @@ $genderLabels = \app\models\Personnel::getGenderList();
             </dd>
         </div>
         <div>
-            <dt class="text-sm font-medium text-gray-500">แผนก</dt>
+            <dt class="text-sm font-medium text-gray-500">สาขา</dt>
             <dd class="text-sm text-gray-900 mt-1">
                 <?= Html::encode($model->department->name ?? '-') ?>
             </dd>

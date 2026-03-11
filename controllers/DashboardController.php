@@ -16,6 +16,8 @@ use app\models\CertificationLevel;
 use app\models\Certification;
 use app\models\Expertise;
 use app\models\PersonnelExpertise;
+use app\models\Research;
+use app\models\AcademicService;
 use yii\db\Expression;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -84,7 +86,7 @@ class DashboardController extends Controller
 
         // === สถิติแยกตามข้อมูลหลัก ===
 
-        // บุคลากรแยกตามแผนก
+        // บุคลากรแยกตามสาขา
         $personnelByDept = Personnel::find()
             ->select(['d.name as label', 'COUNT(*) as total'])
             ->leftJoin('departments d', 'personnels.department_id = d.id')
@@ -133,6 +135,42 @@ class DashboardController extends Controller
             ->limit(10)
             ->asArray()->all();
 
+        // === งานวิจัย และ บริการวิชาการ ===
+
+        // งานวิจัย
+        $totalResearch = Research::find()->count();
+        $researchByStatus = Research::find()
+            ->select(['work_status as label', 'COUNT(*) as total'])
+            ->groupBy('work_status')
+            ->asArray()->all();
+        $researchByFunding = Research::find()
+            ->select(['funding_source as label', 'COUNT(*) as total'])
+            ->groupBy('funding_source')
+            ->orderBy(['total' => SORT_DESC])
+            ->limit(5)
+            ->asArray()->all();
+
+        // บริการวิชาการ
+        $totalAcademicService = AcademicService::find()->count();
+        $academicServiceByStatus = AcademicService::find()
+            ->select(['status as label', 'COUNT(*) as total'])
+            ->groupBy('status')
+            ->asArray()->all();
+        $totalParticipants = AcademicService::find()->sum('participants_count') ?? 0;
+
+        // ข้อมูลแผนที่
+        $researchLocations = Research::find()
+            ->select(['id', 'title', 'latitude', 'longitude'])
+            ->where(['not', ['latitude' => null]])
+            ->andWhere(['not', ['longitude' => null]])
+            ->asArray()->all();
+
+        $academicServiceLocations = AcademicService::find()
+            ->select(['id', 'activity_name', 'latitude', 'longitude'])
+            ->where(['not', ['latitude' => null]])
+            ->andWhere(['not', ['longitude' => null]])
+            ->asArray()->all();
+
         return $this->render('index', [
             'totalStudents' => $totalStudents,
             'activeStudents' => $activeStudents,
@@ -158,6 +196,16 @@ class DashboardController extends Controller
             'scholarByQualification' => $scholarByQualification,
             'certByLevel' => $certByLevel,
             'topExpertises' => $topExpertises,
+            // research & academic service
+            'totalResearch' => $totalResearch,
+            'researchByStatus' => $researchByStatus,
+            'researchByFunding' => $researchByFunding,
+            'totalAcademicService' => $totalAcademicService,
+            'academicServiceByStatus' => $academicServiceByStatus,
+            'totalParticipants' => $totalParticipants,
+            // map data
+            'researchLocations' => $researchLocations,
+            'academicServiceLocations' => $academicServiceLocations,
         ]);
     }
 }

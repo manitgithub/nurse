@@ -23,6 +23,7 @@ $this->title = 'จัดการนักศึกษา';
         <thead class="bg-gray-50">
             <tr>
                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">รหัส</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">รุ่น</th>
                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">ชื่อ-นามสกุล</th>
                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">โรงเรียนมัธยม</th>
                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">GPAX มัธยม</th>
@@ -35,6 +36,13 @@ $this->title = 'จัดการนักศึกษา';
                 <tr class="hover:bg-gray-50 transition">
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-indigo-600">
                         <?= Html::encode($model->student_id) ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <?php if ($model->batch): ?>
+                            <span
+                                class="inline-flex items-center rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-semibold text-indigo-700">รุ่น
+                                <?= Html::encode($model->batch) ?></span>
+                        <?php endif; ?>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         <?= Html::encode($model->fullname) ?>
