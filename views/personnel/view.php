@@ -22,6 +22,18 @@ $genderLabels = \app\models\Personnel::getGenderList();
             </dd>
         </div>
         <div>
+            <dt class="text-sm font-medium text-gray-500">ตำแหน่งทางวิชาการ</dt>
+            <dd class="text-sm text-gray-900 mt-1">
+                <?= Html::encode($model->academic_position ?: '-') ?>
+            </dd>
+        </div>
+        <div>
+            <dt class="text-sm font-medium text-gray-500">ตำแหน่งงาน</dt>
+            <dd class="text-sm text-gray-900 mt-1">
+                <?= Html::encode($model->job_position ?: '-') ?>
+            </dd>
+        </div>
+        <div>
             <dt class="text-sm font-medium text-gray-500">ชื่อ-นามสกุล</dt>
             <dd class="text-sm text-gray-900 mt-1">
                 <?= Html::encode($model->fullname) ?>
@@ -85,6 +97,12 @@ $genderLabels = \app\models\Personnel::getGenderList();
             </dd>
         </div>
         <div>
+            <dt class="text-sm font-medium text-gray-500">สาขาตามโครงสร้าง</dt>
+            <dd class="text-sm text-gray-900 mt-1">
+                <?= Html::encode($model->subjectGroup->name ?? '-') ?>
+            </dd>
+        </div>
+        <div>
             <dt class="text-sm font-medium text-gray-500">สถานะ</dt>
             <dd class="text-sm mt-1">
                 <span
@@ -93,7 +111,30 @@ $genderLabels = \app\models\Personnel::getGenderList();
                 </span>
             </dd>
         </div>
+        <?php if ($model->status == 0 && !empty($model->resignation_year)): ?>
+            <div class="col-span-1 sm:col-span-2 lg:col-span-1 border-l-4 border-red-500 pl-4">
+                <dt class="text-sm font-black text-red-500 uppercase tracking-wider">ปีที่ลาออก (พ.ศ.)</dt>
+                <dd class="text-xl font-bold text-red-700 mt-1">
+                    <?= Html::encode($model->resignation_year) ?>
+                </dd>
+            </div>
+        <?php endif; ?>
     </dl>
+
+    <!-- ความเชี่ยวชาญ -->
+    <?php if (!empty($model->expertises)): ?>
+        <div class="mt-8 pt-6 border-t border-gray-100">
+            <h3 class="text-sm font-bold text-indigo-700 uppercase tracking-wider mb-4">🔬 ความเชี่ยวชาญ</h3>
+            <div class="flex flex-wrap gap-2">
+                <?php foreach ($model->expertises as $expertise): ?>
+                    <span
+                        class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
+                        <?= Html::encode($expertise->name) ?>
+                    </span>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    <?php endif; ?>
 
     <div class="mt-8 pt-6 border-t border-gray-100">
         <h3 class="text-sm font-bold text-indigo-700 uppercase tracking-wider mb-4">🪪 ข้อมูลใบอนุญาตประกอบวิชาชีพ</h3>

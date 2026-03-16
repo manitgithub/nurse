@@ -61,10 +61,10 @@ $this->title = $model->activity_name;
         </dl>
     </div>
 
-    <!-- ยุทธศาสตร์ -->
+    <!-- ยุทธศาสตร์ (Strategic Info) -->
     <div class="bg-white shadow-sm rounded-xl p-6 border border-gray-200">
-        <h2 class="text-lg font-semibold text-gray-800 mb-4">🎯 ยุทธศาสตร์</h2>
-        <dl class="space-y-4">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">🎯 ยุทธศาสตร์ มวล. และ QA</h2>
+        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
             <div>
                 <dt class="text-sm font-medium text-gray-500">เป้าหมายผลสัมฤทธิ์เชิงยุทธศาสตร์</dt>
                 <dd class="text-sm text-gray-900 mt-1 whitespace-pre-line">
@@ -72,10 +72,101 @@ $this->title = $model->activity_name;
                 </dd>
             </div>
             <div>
-                <dt class="text-sm font-medium text-gray-500">ความเชื่อมโยง/ตอบสนองยุทธศาสตร์</dt>
+                <dt class="text-sm font-medium text-gray-500">ประเด็นมุ่งเน้นของโครงการ</dt>
                 <dd class="text-sm text-gray-900 mt-1 whitespace-pre-line">
-                    <?= Html::encode($model->strategy_link) ?: '-' ?>
+                    <?= Html::encode($model->project_focus) ?: '-' ?>
                 </dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-gray-500"><?= $model->getAttributeLabel('strategic_number') ?></dt>
+                <dd class="text-sm text-gray-900 mt-1 whitespace-pre-line">
+                    <?= Html::encode($model->strategic_number) ?: '-' ?>
+                </dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-gray-500">เป้าประสงค์</dt>
+                <dd class="text-sm text-gray-900 mt-1 whitespace-pre-line">
+                    <?= Html::encode($model->strategic_objective) ?: '-' ?>
+                </dd>
+            </div>
+            <div class="sm:col-span-2">
+                <dt class="text-sm font-medium text-gray-500 mb-2">ตัวบ่งชี้ประกันคุณภาพ</dt>
+                <dd class="text-sm text-gray-900 mt-1 space-y-1">
+                    <?php if ($model->qa_indicator_1) echo '<div>- ' . Html::encode($model->qa_indicator_1) . '</div>'; ?>
+                    <?php if ($model->qa_indicator_2) echo '<div>- ' . Html::encode($model->qa_indicator_2) . '</div>'; ?>
+                    <?php if ($model->qa_indicator_3) echo '<div>- ' . Html::encode($model->qa_indicator_3) . '</div>'; ?>
+                    <?php if ($model->qa_indicator_4) echo '<div>- ' . Html::encode($model->qa_indicator_4) . '</div>'; ?>
+                    <?php if ($model->qa_indicator_5) echo '<div>- ' . Html::encode($model->qa_indicator_5) . '</div>'; ?>
+                    <?php if (!$model->qa_indicator_1 && !$model->qa_indicator_2 && !$model->qa_indicator_3 && !$model->qa_indicator_4 && !$model->qa_indicator_5) echo '-'; ?>
+                </dd>
+            </div>
+        </dl>
+    </div>
+
+    <!-- บูรณาการ (Integration) -->
+    <div class="bg-gray-50 shadow-sm rounded-xl p-6 border border-gray-200">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">🔗 การบูรณาการ</h2>
+        <dl class="space-y-4">
+            
+            <?php if ($model->integration_teaching): ?>
+            <div class="bg-white p-3 rounded shadow-sm border border-gray-100">
+                <dt class="text-sm font-medium text-indigo-700">✓ บูรณาการการเรียนการสอน</dt>
+                <dd class="text-sm text-gray-700 mt-1 ml-5">
+                    รายวิชา: <strong><?= Html::encode($model->integration_teaching_subject) ?: '-' ?></strong> 
+                    ภาคการศึกษาที่: <strong><?= Html::encode($model->integration_teaching_semester) ?: '-' ?></strong>
+                </dd>
+            </div>
+            <?php endif; ?>
+
+            <?php if ($model->integration_student_activity): ?>
+            <div class="bg-white p-3 rounded shadow-sm border border-gray-100">
+                <dt class="text-sm font-medium text-indigo-700">✓ บูรณาการกับกิจกรรมนักศึกษา</dt>
+                <dd class="text-sm text-gray-700 mt-1 ml-5">
+                    ขยายความ/ชื่อกิจกรรม: <strong><?= Html::encode($model->integration_student_activity_desc) ?: '-' ?></strong>
+                </dd>
+            </div>
+            <?php endif; ?>
+
+            <?php if ($model->integration_academic_service): ?>
+            <div class="bg-white p-3 rounded shadow-sm border border-gray-100">
+                <dt class="text-sm font-medium text-indigo-700">✓ บูรณาการกับงานบริการวิชาการ</dt>
+                <dd class="text-sm text-gray-700 mt-1 ml-5">
+                    ขยายความ/ชื่องาน: <strong><?= Html::encode($model->integration_academic_service_desc) ?: '-' ?></strong>
+                </dd>
+            </div>
+            <?php endif; ?>
+
+            <?php if ($model->integration_research): ?>
+            <div class="bg-white p-3 rounded shadow-sm border border-gray-100">
+                <dt class="text-sm font-medium text-indigo-700">✓ บูรณาการงานวิจัย</dt>
+                <dd class="text-sm text-gray-700 mt-1 ml-5">
+                    งานวิจัย: <strong><?= Html::encode($model->integration_research_desc) ?: '-' ?></strong>
+                </dd>
+            </div>
+            <?php endif; ?>
+            
+            <?php if ($model->integration_other): ?>
+            <div class="bg-white p-3 rounded shadow-sm border border-gray-100">
+                <dt class="text-sm font-medium text-indigo-700">✓ บูรณาการอื่นๆ</dt>
+                <dd class="text-sm text-gray-700 mt-1 ml-5">
+                    รายละเอียด: <strong><?= Html::encode($model->integration_other) ?></strong>
+                </dd>
+            </div>
+            <?php endif; ?>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 pt-4 border-t border-gray-200">
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">ปัญหาอุปสรรค(หลังจากบูรณาการ)</dt>
+                    <dd class="text-sm text-gray-900 mt-1 whitespace-pre-line">
+                        <?= Html::encode($model->integration_problems) ?: '-' ?>
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">แนวทางการแก้ไข(หลังจากบูรณาการ)</dt>
+                    <dd class="text-sm text-gray-900 mt-1 whitespace-pre-line">
+                        <?= Html::encode($model->integration_solutions) ?: '-' ?>
+                    </dd>
+                </div>
             </div>
         </dl>
     </div>
@@ -85,19 +176,19 @@ $this->title = $model->activity_name;
         <h2 class="text-lg font-semibold text-gray-800 mb-4">💰 งบประมาณ</h2>
         <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
             <div>
-                <dt class="text-sm font-medium text-gray-500">แหล่งงบประมาณ</dt>
+                <dt class="text-sm font-medium text-gray-500"><?= $model->getAttributeLabel('budget_source') ?></dt>
                 <dd class="text-sm text-gray-900 mt-1">
                     <?= Html::encode($model->budget_source) ?: '-' ?>
                 </dd>
             </div>
             <div>
-                <dt class="text-sm font-medium text-gray-500">ค่าใช้จ่ายในโครงการ (บาท)</dt>
+                <dt class="text-sm font-medium text-gray-500"><?= $model->getAttributeLabel('budget_amount') ?></dt>
                 <dd class="text-sm text-gray-900 mt-1 font-semibold">
                     <?= $model->budget_amount ? number_format($model->budget_amount, 2) : '-' ?>
                 </dd>
             </div>
             <div class="sm:col-span-2">
-                <dt class="text-sm font-medium text-gray-500">หมวดงบประมาณที่ใช้</dt>
+                <dt class="text-sm font-medium text-gray-500"><?= $model->getAttributeLabel('budget_category') ?></dt>
                 <dd class="text-sm text-gray-900 mt-1">
                     <?= Html::encode($model->budget_category) ?: '-' ?>
                 </dd>
@@ -116,7 +207,7 @@ $this->title = $model->activity_name;
                 </dd>
             </div>
             <div>
-                <dt class="text-sm font-medium text-gray-500">วันที่สิ้นสุด</dt>
+                <dt class="text-sm font-medium text-gray-500">ถึงวันที่</dt>
                 <dd class="text-sm text-gray-900 mt-1">
                     <?= $model->end_date ?: '-' ?>
                 </dd>
@@ -147,7 +238,7 @@ $this->title = $model->activity_name;
                 </dd>
             </div>
             <div>
-                <dt class="text-sm font-medium text-gray-500">จำนวนผู้เข้ารับบริการ (คน)</dt>
+                <dt class="text-sm font-medium text-gray-500"><?= $model->getAttributeLabel('participants_count') ?></dt>
                 <dd class="text-sm text-gray-900 mt-1">
                     <?= $model->participants_count ? number_format($model->participants_count) : '-' ?>
                 </dd>

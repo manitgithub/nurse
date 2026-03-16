@@ -28,12 +28,37 @@ class InnovationController extends Controller
 
     public function actionIndex()
     {
-        $dataProvider = new ActiveDataProvider([
-            'query' => Innovation::find(),
-            'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
-            'pagination' => ['pageSize' => 20],
+        $searchModel = new \app\models\InnovationSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        // Get total stats
+        $totalInnovation = Innovation::find()->count();
+
+        // Group by year using invention_date
+        $yearCounts = Innovation::find()
+            ->select([
+                new \yii\db\Expression('YEAR(invention_date) as year'),
+                'COUNT(*) as count'
+            ])
+            ->where(['not', ['invention_date' => null]])
+            ->groupBy(new \yii\db\Expression('YEAR(invention_date)'))
+            ->orderBy(['year' => SORT_DESC])
+            ->asArray()
+            ->all();
+
+        // Convert to associative array for easier access
+        $yearSummary = [];
+        foreach ($yearCounts as $row) {
+            $year = empty($row['year']) ? 'ไม่ระบุ' : $row['year'];
+            $yearSummary[$year] = $row['count'];
+        }
+
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'totalInnovation' => $totalInnovation,
+            'yearSummary' => $yearSummary,
         ]);
-        return $this->render('index', ['dataProvider' => $dataProvider]);
     }
 
     public function actionView($id)

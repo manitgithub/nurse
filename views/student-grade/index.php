@@ -13,10 +13,43 @@ $this->title = 'ผลการเรียน (GPAX)';
         <?= Html::encode($this->title) ?>
     </h1>
     <div class="flex space-x-2">
+        <?= Html::a('📤 นำเข้า Excel', ['import'], ['class' => 'bg-amber-500 hover:bg-amber-600 text-white font-medium py-2 px-4 rounded-lg shadow-sm transition']) ?>
         <?= Html::a('📋 บันทึกแบบกลุ่ม', ['batch-create'], ['class' => 'bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-4 rounded-lg shadow-sm transition']) ?>
         <?= Html::a('+ เพิ่มผลการเรียน', ['create'], ['class' => 'bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg shadow-sm transition']) ?>
     </div>
 </div>
+
+<?php if (!empty($stats)): ?>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <?php foreach ($stats as $stat): ?>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition">
+                <div class="flex items-center justify-between mb-3">
+                    <span
+                        class="inline-flex items-center rounded-md bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10">
+                        รหัส <?= Html::encode($stat['batch'] ?: 'N/A') ?>
+                    </span>
+                    <span class="text-xs text-gray-400"><?= $stat['count'] ?> รายการ</span>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex justify-between items-end">
+                        <span class="text-sm text-gray-500">ค่าเฉลี่ย (Avg)</span>
+                        <span class="text-xl font-bold text-indigo-600"><?= number_format($stat['avg_gpax'], 2) ?></span>
+                    </div>
+                    <div class="flex justify-between text-xs pt-2 border-t border-gray-50">
+                        <div class="flex flex-col">
+                            <span class="text-gray-400">สูงสุด (Max)</span>
+                            <span class="font-semibold text-emerald-600"><?= number_format($stat['max_gpax'], 2) ?></span>
+                        </div>
+                        <div class="flex flex-col items-end">
+                            <span class="text-gray-400">ต่ำสุด (Min)</span>
+                            <span class="font-semibold text-rose-600"><?= number_format($stat['min_gpax'], 2) ?></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>
 
 <div class="bg-white shadow-sm rounded-xl overflow-hidden border border-gray-200">
     <div class="overflow-x-auto">

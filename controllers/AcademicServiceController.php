@@ -28,12 +28,29 @@ class AcademicServiceController extends Controller
 
     public function actionIndex()
     {
-        $dataProvider = new ActiveDataProvider([
-            'query' => AcademicService::find(),
-            'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
-            'pagination' => ['pageSize' => 20],
+        $searchModel = new \app\models\AcademicServiceSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        // Fetch statistics based on the filtered query
+        $query = clone $dataProvider->query;
+
+        $totalActivities = $query->count();
+        $totalBudget = $query->sum('budget_amount') ?: 0;
+
+        // Status breakdown
+        $statusQuery = clone $dataProvider->query;
+        $statusBreakdown = $statusQuery->select(['status', 'COUNT(*) as count'])
+            ->groupBy('status')
+            ->asArray()
+            ->all();
+
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'totalActivities' => $totalActivities,
+            'totalBudget' => $totalBudget,
+            'statusBreakdown' => $statusBreakdown,
         ]);
-        return $this->render('index', ['dataProvider' => $dataProvider]);
     }
 
     public function actionView($id)
@@ -47,7 +64,7 @@ class AcademicServiceController extends Controller
         $model = new AcademicService();
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             $this->handleFileUploads($model);
-            Yii::$app->session->setFlash('success', 'เพิ่มข้อมูลบริการวิชาการสำเร็จ');
+            Yii::$app->session->setFlash('success', 'เพิ่มข้อมูลบริการวิชาการ/ทำนุบำรุงวัฒนธรรมสำเร็จ');
             return $this->redirect(['view', 'id' => $model->id]);
         }
         return $this->render('create', ['model' => $model]);

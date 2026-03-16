@@ -9,7 +9,7 @@ use yii\helpers\Url;
 $this->title = 'บันทึก UKPSF แบบกลุ่ม';
 ?>
 
-<div x-data="batchCertify()" class="max-w-6xl mx-auto space-y-6">
+<div x-data="batchCertify()" class="max-w-full mx-auto space-y-6">
     <div class="flex items-center justify-between">
         <div class="flex items-center space-x-3">
             <h1 class="text-2xl font-bold text-gray-900 leading-tight">🏅
@@ -42,8 +42,8 @@ $this->title = 'บันทึก UKPSF แบบกลุ่ม';
                     class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 text-sm">
             </div>
             <div>
-                <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">รุ่นที่อบรม</label>
-                <input type="text" x-model="bulk.batch" placeholder="เช่น รุ่น 1"
+                <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">รหัสที่อบรม</label>
+                <input type="text" x-model="bulk.batch" placeholder="เช่น รหัส 1"
                     class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 text-sm">
             </div>
             <div>
@@ -75,7 +75,7 @@ $this->title = 'บันทึก UKPSF แบบกลุ่ม';
                             <th class="px-6 py-4 text-center text-xs font-bold uppercase tracking-widest w-40">
                                 วันที่ได้รับ</th>
                             <th class="px-6 py-4 text-center text-xs font-bold uppercase tracking-widest w-32">
-                                รุ่นที่อบรม</th>
+                                รหัสที่อบรม</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">

@@ -28,12 +28,34 @@ class ResearchController extends Controller
 
     public function actionIndex()
     {
-        $dataProvider = new ActiveDataProvider([
-            'query' => Research::find(),
-            'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
-            'pagination' => ['pageSize' => 20],
+        $searchModel = new \app\models\ResearchSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        // Get total stats
+        $totalProjects = Research::find()->count();
+        $totalBudget = Research::find()->sum('budget') ?? 0;
+
+        // Group by status
+        $statusCounts = Research::find()
+            ->select(['work_status', 'COUNT(*) as count'])
+            ->groupBy('work_status')
+            ->asArray()
+            ->all();
+
+        // Convert to associative array for easier access
+        $statusSummary = [];
+        foreach ($statusCounts as $row) {
+            $status = empty($row['work_status']) ? 'ไม่ระบุ' : $row['work_status'];
+            $statusSummary[$status] = $row['count'];
+        }
+
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'totalProjects' => $totalProjects,
+            'totalBudget' => $totalBudget,
+            'statusSummary' => $statusSummary,
         ]);
-        return $this->render('index', ['dataProvider' => $dataProvider]);
     }
 
     public function actionView($id)

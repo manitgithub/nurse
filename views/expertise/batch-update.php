@@ -8,7 +8,7 @@ use yii\helpers\Url;
 $this->title = 'จัดการความเชี่ยวชาญบุคลากร';
 ?>
 
-<div x-data="expertiseBatch()" class="max-w-6xl mx-auto space-y-6">
+<div x-data="expertiseBatch()" class="max-w-full mx-auto space-y-6">
     <div class="flex items-center justify-between mb-2">
         <h1 class="text-2xl font-bold text-gray-900">🧬
             <?= Html::encode($this->title) ?>

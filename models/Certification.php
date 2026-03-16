@@ -30,7 +30,7 @@ class Certification extends ActiveRecord
             'id' => 'ID',
             'personnel_id' => 'บุคลากร',
             'certification_level_id' => 'ระดับใบรับรอง',
-            'training_batch' => 'รุ่นที่อบรม',
+            'training_batch' => 'รหัสที่อบรม',
             'certified_date' => 'วันที่ได้รับ',
             'remark' => 'หมายเหตุ',
         ];

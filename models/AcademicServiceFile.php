@@ -28,7 +28,7 @@ class AcademicServiceFile extends ActiveRecord
     {
         return [
             'id' => 'ID',
-            'academic_service_id' => 'บริการวิชาการ',
+            'academic_service_id' => 'บริการวิชาการ/ทำนุบำรุงวัฒนธรรม',
             'file_path' => 'ไฟล์',
             'file_type' => 'ประเภทไฟล์',
             'original_name' => 'ชื่อไฟล์',

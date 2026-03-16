@@ -11,7 +11,7 @@ $statusList = \app\models\ExamResult::getStatusList();
     <h1 class="text-2xl font-bold text-gray-900">📝
         <?= Html::encode($this->title) ?>
     </h1>
-    <p class="text-sm text-gray-500 mt-1">เลือกรุ่นและรอบสอบ แล้วระบุผลการสอบรายวิชาของนักศึกษา</p>
+    <p class="text-sm text-gray-500 mt-1">เลือกรหัสและรอบสอบ แล้วระบุผลการสอบรายวิชาของนักศึกษา</p>
 </div>
 
 <!-- Step 1: Select Batch & Round -->
@@ -19,10 +19,10 @@ $statusList = \app\models\ExamResult::getStatusList();
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">เลือกรุ่น <span
+            <label class="block text-sm font-medium text-gray-700 mb-1">เลือกรหัส <span
                     class="text-red-500">*</span></label>
             <select x-model="selectedBatch" @change="loadStudents()" class="<?= $inputClass ?>">
-                <option value="">-- เลือกรุ่น --</option>
+                <option value="">-- เลือกรหัส --</option>
                 <?php foreach ($batches as $key => $label): ?>
                     <option value="<?= Html::encode($key) ?>">
                         <?= Html::encode($label) ?>
@@ -68,7 +68,7 @@ $statusList = \app\models\ExamResult::getStatusList();
             <div class="mb-4 flex items-center justify-between">
                 <p class="text-sm text-gray-600">
                     พบนักศึกษา <span class="font-bold text-indigo-600" x-text="students.length"></span> คน
-                    ในรุ่น <span class="font-bold" x-text="selectedBatch"></span>
+                    ในรหัส <span class="font-bold" x-text="selectedBatch"></span>
                 </p>
                 <button type="submit" :disabled="!selectedRound"
                     class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition font-medium shadow-sm">
@@ -151,8 +151,8 @@ $statusList = \app\models\ExamResult::getStatusList();
     <!-- Empty state -->
     <template x-if="students.length === 0 && !loading && attempted">
         <div class="text-center py-8 text-gray-400">
-            <p class="text-lg">ไม่พบนักศึกษาในรุ่นที่เลือก</p>
-            <p class="text-sm mt-1">กรุณาตรวจสอบว่ามีการเพิ่มนักศึกษาในรุ่นนี้แล้ว</p>
+            <p class="text-lg">ไม่พบนักศึกษาในรหัสที่เลือก</p>
+            <p class="text-sm mt-1">กรุณาตรวจสอบว่ามีการเพิ่มนักศึกษาในรหัสนี้แล้ว</p>
         </div>
     </template>
 </div>

@@ -10,7 +10,7 @@ class m260310_040012_create_certifications_table extends Migration
             'id' => $this->primaryKey(),
             'personnel_id' => $this->integer()->notNull(),
             'certification_level_id' => $this->integer(),
-            'training_batch' => $this->string(100)->comment('รุ่นที่อบรม'),
+            'training_batch' => $this->string(100)->comment('รหัสที่อบรม'),
             'certified_date' => $this->date(),
             'remark' => $this->text(),
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),

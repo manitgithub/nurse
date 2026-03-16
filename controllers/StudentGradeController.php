@@ -10,6 +10,8 @@ use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\helpers\ArrayHelper;
+use yii\web\UploadedFile;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class StudentGradeController extends Controller
 {
@@ -33,8 +35,24 @@ class StudentGradeController extends Controller
             'pagination' => ['pageSize' => 20],
         ]);
 
+        // Calculate statistics by batch
+        $stats = StudentGrade::find()
+            ->select([
+                'students.batch',
+                'AVG(student_grades.gpax) as avg_gpax',
+                'MAX(student_grades.gpax) as max_gpax',
+                'MIN(student_grades.gpax) as min_gpax',
+                'COUNT(*) as count'
+            ])
+            ->innerJoin('students', 'student_grades.student_id = students.student_id')
+            ->groupBy('students.batch')
+            ->orderBy(['students.batch' => SORT_ASC])
+            ->asArray()
+            ->all();
+
         return $this->render('index', [
             'dataProvider' => $dataProvider,
+            'stats' => $stats,
         ]);
     }
 
@@ -71,6 +89,68 @@ class StudentGradeController extends Controller
         $this->findModel($id)->delete();
         Yii::$app->session->setFlash('success', 'ลบข้อมูลสำเร็จ');
         return $this->redirect(['index']);
+    }
+
+    /**
+     * Import GPAX from Excel
+     */
+    public function actionImport()
+    {
+        if (Yii::$app->request->isPost) {
+            $file = UploadedFile::getInstanceByName('excelFile');
+            if ($file) {
+                try {
+                    $spreadsheet = IOFactory::load($file->tempName);
+                    $sheet = $spreadsheet->getActiveSheet();
+                    $data = $sheet->toArray();
+
+                    $successCount = 0;
+                    $errorCount = 0;
+                    $errors = [];
+
+                    // Skip header (row 0)
+                    for ($i = 1; $i < count($data); $i++) {
+                        $row = $data[$i];
+                        if (empty($row[0]) || empty($row[1]) || empty($row[2]))
+                            continue;
+
+                        $term = trim($row[0]);
+                        $year = trim($row[1]);
+                        $studentId = trim($row[2]);
+                        $gpax = trim($row[3]);
+
+                        $academicYear = $term . '/' . $year;
+
+                        $model = StudentGrade::findOne([
+                            'student_id' => $studentId,
+                            'academic_year' => $academicYear
+                        ]) ?: new StudentGrade();
+
+                        $model->student_id = $studentId;
+                        $model->academic_year = $academicYear;
+                        $model->gpax = $gpax;
+
+                        if ($model->save()) {
+                            $successCount++;
+                        } else {
+                            $errorCount++;
+                            $errors[] = "Row " . ($i + 1) . " ($studentId): " . implode(', ', $model->getFirstErrors());
+                        }
+                    }
+
+                    Yii::$app->session->setFlash('success', "นำเข้าข้อมูลสำเร็จ {$successCount} รายการ");
+                    if ($errorCount > 0) {
+                        Yii::$app->session->setFlash('error', "พบข้อผิดพลาด {$errorCount} รายการ: " . implode('; ', $errors));
+                    }
+                    return $this->redirect(['index']);
+
+                } catch (\Exception $e) {
+                    Yii::$app->session->setFlash('error', 'เกิดข้อผิดพลาดในการอ่านไฟล์: ' . $e->getMessage());
+                }
+            }
+        }
+
+        return $this->render('import');
     }
 
     /**

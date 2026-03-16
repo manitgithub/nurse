@@ -8,6 +8,7 @@ use app\models\Expertise;
 use app\models\Qualification;
 use app\models\ContractType;
 use app\models\Department;
+use app\models\SubjectGroup;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
@@ -33,12 +34,22 @@ class PersonnelController extends Controller
 
     public function actionIndex()
     {
-        $dataProvider = new ActiveDataProvider([
-            'query' => Personnel::find()->with(['qualification', 'contractType', 'department']),
-            'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
-            'pagination' => ['pageSize' => 20],
+        $searchModel = new \app\models\PersonnelSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        $stats = [
+            'total' => Personnel::find()->count(),
+            'academic' => Personnel::find()->where(['track' => 'สาย ว'])->count(),
+            'operational' => Personnel::find()->where(['track' => 'สาย ป'])->count(),
+            'active' => Personnel::find()->where(['status' => 1])->count(),
+            'inactive' => Personnel::find()->where(['status' => 0])->count(),
+        ];
+
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'stats' => $stats,
         ]);
-        return $this->render('index', ['dataProvider' => $dataProvider]);
     }
 
     public function actionView($id)
@@ -99,6 +110,7 @@ class PersonnelController extends Controller
             'qualifications' => ArrayHelper::map(Qualification::find()->where(['status' => 1])->all(), 'id', 'name'),
             'contractTypes' => ArrayHelper::map(ContractType::find()->where(['status' => 1])->all(), 'id', 'name'),
             'departments' => ArrayHelper::map(Department::find()->where(['status' => 1])->all(), 'id', 'name'),
+            'subjectGroups' => ArrayHelper::map(SubjectGroup::find()->where(['status' => 1])->all(), 'id', 'name'),
             'expertiseList' => ArrayHelper::map(Expertise::find()->orderBy('name')->all(), 'id', 'name'),
             'selectedExpertises' => $selectedExpertises,
         ];
@@ -139,6 +151,39 @@ class PersonnelController extends Controller
         }
 
         $model->save(false, ['photo', 'license_file', 'member_card_file']);
+    }
+
+    /**
+     * Save personnel expertise relations
+     */
+    protected function saveExpertises($model)
+    {
+        PersonnelExpertise::deleteAll(['personnel_id' => $model->id]);
+        $expertises = Yii::$app->request->post('PersonnelExpertise', []);
+        if (is_array($expertises)) {
+            foreach ($expertises as $val) {
+                if (empty(trim($val))) continue;
+                $val = trim($val);
+                
+                if (!is_numeric($val)) {
+                    $exp = Expertise::findOne(['name' => $val]);
+                    if (!$exp) {
+                        $exp = new Expertise();
+                        $exp->name = $val;
+                        $exp->status = 1;
+                        $exp->save(false);
+                    }
+                    $eid = $exp->id;
+                } else {
+                    $eid = (int)$val;
+                }
+
+                $pe = new PersonnelExpertise();
+                $pe->personnel_id = $model->id;
+                $pe->expertise_id = $eid;
+                $pe->save();
+            }
+        }
     }
 
     protected function findModel($id)

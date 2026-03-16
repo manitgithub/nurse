@@ -40,7 +40,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     <div class="min-h-full">
         <!-- Navigation -->
         <nav class="bg-gradient-to-r from-indigo-700 via-indigo-600 to-purple-600 shadow-lg">
-            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="mx-auto max-w-full px-4 sm:px-6 lg:px-8">
                 <div class="flex h-16 items-center justify-between">
                     <div class="flex items-center">
                         <a href="<?= Yii::$app->homeUrl ?>" class="flex items-center space-x-2">
@@ -55,6 +55,8 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                             <div class="flex items-baseline space-x-1">
                                 <a href="<?= \yii\helpers\Url::to(['/dashboard/index']) ?>"
                                     class="text-white hover:bg-white/20 rounded-md px-3 py-2 text-sm font-medium transition">แดชบอร์ด</a>
+                                <a href="<?= \yii\helpers\Url::to(['/budget/index']) ?>"
+                                    class="text-indigo-100 hover:bg-white/20 hover:text-white rounded-md px-3 py-2 text-sm font-medium transition">รายรับ-รายจ่าย</a>
 
                                 <!-- Students Dropdown -->
                                 <div class="relative group">
@@ -103,7 +105,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                                     <div
                                         class="absolute left-0 mt-0 w-48 rounded-md shadow-lg bg-white ring-1 ring-black/5 hidden group-hover:block z-50">
                                         <a href="<?= \yii\helpers\Url::to(['/academic-service/index']) ?>"
-                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">บริการวิชาการ</a>
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">บริการวิชาการ/ทำนุบำรุงวัฒนธรรม</a>
                                         <a href="<?= \yii\helpers\Url::to(['/research/index']) ?>"
                                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">งานวิจัย</a>
                                         <a href="<?= \yii\helpers\Url::to(['/innovation/index']) ?>"
@@ -124,6 +126,8 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">ประเภทสัญญา</a>
                                         <a href="<?= \yii\helpers\Url::to(['/department/index']) ?>"
                                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">สาขา</a>
+                                        <a href="<?= \yii\helpers\Url::to(['/subject-group/index']) ?>"
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">สาขาตามโครงสร้าง</a>
                                         <a href="<?= \yii\helpers\Url::to(['/certification-level/index']) ?>"
                                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">ระดับใบรับรอง</a>
                                         <a href="<?= \yii\helpers\Url::to(['/expertise/index']) ?>"
@@ -148,7 +152,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
             </div>
         </nav>
 
-        <main class="mx-auto max-w-7xl py-6 px-4 sm:px-6 lg:px-8">
+        <main class="mx-auto max-w-full py-6 px-4 sm:px-6 lg:px-8">
             <?= Alert::widget() ?>
             <?= $content ?>
         </main>

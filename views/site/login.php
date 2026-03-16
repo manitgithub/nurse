@@ -153,61 +153,35 @@ $this->title = 'เข้าสู่ระบบ';
 
         <?php ActiveForm::end(); ?>
 
-        <!-- Divider -->
-        <div class="relative my-6">
-            <div class="absolute inset-0 flex items-center">
-                <div class="w-full border-t border-gray-200"></div>
-            </div>
-            <div class="relative flex justify-center text-xs"><span
-                    class="px-3 bg-white text-gray-400">ข้อมูลสำหรับทดสอบ</span></div>
-        </div>
 
-        <!-- Hint Credentials -->
-        <div class="bg-indigo-50 rounded-xl p-4 border border-indigo-100">
-            <div class="flex items-start space-x-3">
-                <div class="flex-shrink-0 mt-0.5">
-                    <svg class="w-5 h-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
-                    </svg>
-                </div>
-                <div class="text-sm">
-                    <p class="text-indigo-800 font-medium">บัญชีทดสอบ</p>
-                    <p class="text-indigo-600 mt-1">Username: <code
-                            class="bg-indigo-100 px-1.5 py-0.5 rounded text-xs font-mono">admin</code> &nbsp; Password:
-                        <code class="bg-indigo-100 px-1.5 py-0.5 rounded text-xs font-mono">admin</code></p>
-                </div>
-            </div>
-        </div>
+
+        <!-- Footer -->
+        <p class="text-center text-white/60 text-sm mt-6">&copy; <?= date('Y') ?> ระบบสถิติและจัดการข้อมูลสำนักพยาบาล
+        </p>
     </div>
 
-    <!-- Footer -->
-    <p class="text-center text-white/60 text-sm mt-6">&copy; <?= date('Y') ?> ระบบสถิติและจัดการข้อมูลสำนักพยาบาล</p>
-</div>
+    <style>
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
 
-<style>
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
+        @keyframes pulse {
 
-    @keyframes pulse {
+            0%,
+            100% {
+                box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+            }
 
-        0%,
-        100% {
-            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+            50% {
+                box-shadow: 0 10px 25px -3px rgba(99, 102, 241, 0.5);
+            }
         }
-
-        50% {
-            box-shadow: 0 10px 25px -3px rgba(99, 102, 241, 0.5);
-        }
-    }
-</style>
+    </style>

@@ -1,6 +1,8 @@
 <?php
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use app\models\Personnel;
+use yii\helpers\ArrayHelper;
 
 /** @var yii\web\View $this */
 /** @var app\models\Student $model */
@@ -18,7 +20,7 @@ use yii\widgets\ActiveForm;
                 <?= $form->field($model, 'student_id')->textInput(['class' => 'w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-3 py-2 border', 'maxlength' => true])->label(false) ?>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">รุ่น <span
+                <label class="block text-sm font-medium text-gray-700 mb-1">รหัส <span
                         class="text-red-500">*</span></label>
                 <?= $form->field($model, 'batch')->textInput(['class' => 'w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-3 py-2 border', 'placeholder' => 'เช่น 69', 'maxlength' => true])->label(false) ?>
             </div>
@@ -48,6 +50,14 @@ use yii\widgets\ActiveForm;
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">สถานะ</label>
                 <?= $form->field($model, 'status')->dropDownList(\app\models\Student::getStatusList(), ['class' => 'w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-3 py-2 border', 'prompt' => '-- เลือก --'])->label(false) ?>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">อาจารย์ที่ปรึกษา</label>
+                <?php
+                $advisors = Personnel::find()->where(['track' => 'สาย ว'])->orderBy(['fullname' => SORT_ASC])->all();
+                $advisorList = ArrayHelper::map($advisors, 'id', 'fullname');
+                ?>
+                <?= $form->field($model, 'advisor_id')->dropDownList($advisorList, ['class' => 'w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-3 py-2 border', 'prompt' => '-- เลือก --'])->label(false) ?>
             </div>
         </div>
 
