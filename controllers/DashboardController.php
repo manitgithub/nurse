@@ -38,6 +38,47 @@ class DashboardController extends Controller
         ];
     }
 
+    /**
+     * Safely extract a year integer from a value that may be:
+     * - a 4-digit year (AD or Thai BE)
+     * - a full date string parseable by DateTime
+     * - a string containing a 4-digit year somewhere inside
+     *
+     * Returns int year (AD) or null when it cannot be determined.
+     */
+    private function extractYearSafe($value)
+    {
+        if ($value === null) {
+            return null;
+        }
+        $s = trim((string)$value);
+        if ($s === '') {
+            return null;
+        }
+
+        // Try to find a 4-digit year in the string (common cases)
+        if (preg_match('/\b(1[89]\d{2}|20\d{2}|25\d{2})\b/', $s, $m)) {
+            $y = (int)$m[0];
+            // Convert Thai BE (25xx) to AD
+            if ($y > 2400) {
+                $y -= 543;
+            }
+            return $y;
+        }
+
+        // Fallback: try to parse with DateTime. This avoids direct strtotime() calls
+        try {
+            $dt = new \DateTime($s);
+            $y = (int)$dt->format('Y');
+            if ($y > 2400) {
+                $y -= 543;
+            }
+            return $y;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
     public function actionIndex()
     {
         // นักศึกษา - อัตราการคงอยู่
@@ -185,6 +226,8 @@ class DashboardController extends Controller
 
         // บุคลากร
         $activePersonnel = Personnel::find()->where(['status' => 1])->count();
+        $activeAcademic = Personnel::find()->where(['status' => 1, 'track' => 'สาย ว'])->count();
+        $activeOperational = Personnel::find()->where(['status' => 1, 'track' => 'สาย ป'])->count();
         
         // อัตรากำลังย้อนหลัง 5 ปี
         $currentYear = (int)date('Y');
@@ -197,15 +240,15 @@ class DashboardController extends Controller
             $activeCount = 0;
             
             foreach ($allPersonnelData as $p) {
-                $startYear = (int)date('Y', strtotime($p->start_date));
-                if ($startYear <= $y) {
+                $startYear = $this->extractYearSafe($p->start_date);
+                if ($startYear !== null && $startYear <= $y) {
                     $isLeft = false;
                     if ($p->status == 0) {
                         $leftYear = null;
                         if (!empty($p->resignation_year)) {
-                            $leftYear = (int)$p->resignation_year - 543;
+                            $leftYear = $this->extractYearSafe($p->resignation_year);
                         } elseif (!empty($p->contract_end_date)) {
-                            $leftYear = (int)date('Y', strtotime($p->contract_end_date));
+                            $leftYear = $this->extractYearSafe($p->contract_end_date);
                         }
                         
                         if ($leftYear !== null && $leftYear <= $y) {
@@ -225,62 +268,135 @@ class DashboardController extends Controller
         // นักเรียนทุน
         $totalScholarships = Scholarship::find()->count();
 
+        // สถิตินักเรียนทุนย้อนหลัง 5 ปี
+        $scholarshipRetentionStats = [];
+        $allScholarshipData = Scholarship::find()->where(['not', ['start_date' => null]])->all();
+
+        for ($i = 4; $i >= 0; $i--) {
+            $y = $currentYear - $i;
+            $y_th = $y + 543;
+            $activeCount = 0;
+            
+            foreach ($allScholarshipData as $s) {
+                // ตรวจสอบว่า "กำลังศึกษา" ในปีนั้นหรือไม่
+                // เริ่มต้นก่อนหรือในปีนั้น และ (ยังไม่สิ้นสุด หรือ สิ้นสุดในปีนั้นหรือหลังจากนั้น)
+                $startYear = $this->extractYearSafe($s->start_date);
+                if ($startYear !== null && $startYear <= $y) {
+                    $endYear = $this->extractYearSafe($s->end_date);
+                    if (empty($s->end_date) || $endYear === null || $endYear >= $y) {
+                        $activeCount++;
+                    }
+                }
+
+            }
+            $scholarshipRetentionStats[$y_th] = $activeCount; 
+        }
+
         // ผลสอบใบอนุญาต (ใช้ข้อมูลจาก ExamResult แทน LicenseExam เพื่อให้ตรงกับที่บันทึกจริง)
         $licenseTotal = ExamResult::find()->select('student_id')->distinct()->count();
         $licensePassed = ExamResult::find()->where(['status' => 'passed'])->select('student_id')->distinct()->count();
         $licenseRate = $licenseTotal > 0 ? round($licensePassed / $licenseTotal * 100, 1) : 0;
 
-        // === สถิติแยกตามข้อมูลหลัก ===
+        // === สถิติแยกตามข้อมูลหลัก (บุคลากรที่ปฏิบัติงานเท่านั้น) ===
+        $personnelStatsByTrack = ['total' => [], 'academic' => [], 'operational' => []];
+        $tracks = [
+            'total' => [],
+            'academic' => ['track' => 'สาย ว'],
+            'operational' => ['track' => 'สาย ป']
+        ];
 
-        // บุคลากรแยกตามสาขา
-        $personnelByDept = Personnel::find()
-            ->select(['d.name as label', 'COUNT(*) as total'])
-            ->leftJoin('departments d', 'personnels.department_id = d.id')
-            ->groupBy('personnels.department_id')
-            ->orderBy(['total' => SORT_DESC])
-            ->asArray()->all();
+        foreach ($tracks as $key => $filter) {
+            $baseQuery = Personnel::find()->where(['personnels.status' => 1]);
+            if (!empty($filter)) {
+                $baseQuery->andWhere($filter);
+            }
 
-        // บุคลากรแยกตามประเภทสัญญา
-        $personnelByContract = Personnel::find()
-            ->select(['c.name as label', 'COUNT(*) as total'])
-            ->leftJoin('contract_types c', 'personnels.contract_type_id = c.id')
-            ->groupBy('personnels.contract_type_id')
-            ->orderBy(['total' => SORT_DESC])
-            ->asArray()->all();
+            // บุคลากรแยกตามสาขา
+            $personnelStatsByTrack[$key]['dept'] = (clone $baseQuery)
+                ->select(['d.name as label', 'COUNT(*) as total'])
+                ->leftJoin('departments d', 'personnels.department_id = d.id')
+                ->groupBy('personnels.department_id')
+                ->orderBy(['total' => SORT_DESC])
+                ->asArray()->all();
 
-        // บุคลากรแยกตามสาย (ป/ว)
-        $personnelByTrack = Personnel::find()
-            ->select(['track as label', 'COUNT(*) as total'])
-            ->where(['not', ['track' => null]])
-            ->groupBy('track')
-            ->orderBy(['total' => SORT_DESC])
-            ->asArray()->all();
+            // บุคลากรแยกตามประเภทสัญญา
+            $personnelStatsByTrack[$key]['contract'] = (clone $baseQuery)
+                ->select(['c.name as label', 'COUNT(*) as total'])
+                ->leftJoin('contract_types c', 'personnels.contract_type_id = c.id')
+                ->groupBy('personnels.contract_type_id')
+                ->orderBy(['total' => SORT_DESC])
+                ->asArray()->all();
 
-        // บุคลากรแยกตามตำแหน่งทางวิชาการ
-        $personnelByAcademicPosition = Personnel::find()
-            ->select(['academic_position as label', 'COUNT(*) as total'])
-            ->where(['not', ['academic_position' => null]])
-            ->andWhere(['!=', 'academic_position', ''])
-            ->groupBy('academic_position')
-            ->orderBy(['total' => SORT_DESC])
-            ->asArray()->all();
+            // บุคลากรแยกตามสาย (ป/ว) - only for 'total'
+            if ($key === 'total') {
+                $personnelStatsByTrack[$key]['track'] = (clone $baseQuery)
+                    ->select(['track as label', 'COUNT(*) as total'])
+                    ->where(['personnels.status' => 1])
+                    ->andWhere(['not', ['track' => null]])
+                    ->groupBy('track')
+                    ->orderBy(['total' => SORT_DESC])
+                    ->asArray()->all();
+            }
 
-        // บุคลากรแยกตามตำแหน่งงาน
-        $personnelByJobPosition = Personnel::find()
-            ->select(['job_position as label', 'COUNT(*) as total'])
-            ->where(['not', ['job_position' => null]])
-            ->andWhere(['!=', 'job_position', ''])
-            ->groupBy('job_position')
-            ->orderBy(['total' => SORT_DESC])
-            ->asArray()->all();
+            // บุคลากรแยกตามตำแหน่งทางวิชาการ
+            $personnelStatsByTrack[$key]['academicPosition'] = (clone $baseQuery)
+                ->select(['academic_position as label', 'COUNT(*) as total'])
+                ->andWhere(['not', ['academic_position' => null]])
+                ->andWhere(['!=', 'academic_position', ''])
+                ->groupBy('academic_position')
+                ->orderBy(['total' => SORT_DESC])
+                ->asArray()->all();
 
-        // บุคลากรแยกตามคุณวุฒิ
-        $personnelByQualification = Personnel::find()
-            ->select(['q.name as label', 'COUNT(*) as total'])
-            ->leftJoin('qualifications q', 'personnels.qualification_id = q.id')
-            ->groupBy('personnels.qualification_id')
-            ->orderBy(['total' => SORT_DESC])
-            ->asArray()->all();
+            // บุคลากรแยกตามตำแหน่งงาน
+            $personnelStatsByTrack[$key]['jobPosition'] = (clone $baseQuery)
+                ->select(['job_position as label', 'COUNT(*) as total'])
+                ->andWhere(['not', ['job_position' => null]])
+                ->andWhere(['!=', 'job_position', ''])
+                ->groupBy('job_position')
+                ->orderBy(['total' => SORT_DESC])
+                ->asArray()->all();
+
+            // บุคลากรแยกตามคุณวุฒิ
+            $personnelStatsByTrack[$key]['qualification'] = (clone $baseQuery)
+                ->select(['q.name as label', 'COUNT(*) as total'])
+                ->leftJoin('qualifications q', 'personnels.qualification_id = q.id')
+                ->groupBy('personnels.qualification_id')
+                ->orderBy(['total' => SORT_DESC])
+                ->asArray()->all();
+
+            // ใบรับรองแยกตามระดับ
+            $personnelStatsByTrack[$key]['cert'] = Certification::find()
+                ->select(['cl.name as label', 'COUNT(*) as total'])
+                ->innerJoin('personnels p', 'certifications.personnel_id = p.id')
+                ->leftJoin('certification_levels cl', 'certifications.certification_level_id = cl.id')
+                ->where(['p.status' => 1])
+                ->andFilterWhere($filter)
+                ->groupBy('certifications.certification_level_id')
+                ->orderBy(['total' => SORT_DESC])
+                ->asArray()->all();
+
+            // ความเชี่ยวชาญยอดนิยม
+            $personnelStatsByTrack[$key]['expertise'] = PersonnelExpertise::find()
+                ->select(['e.name as label', 'COUNT(*) as total'])
+                ->innerJoin('personnels p', 'personnel_expertises.personnel_id = p.id')
+                ->leftJoin('expertises e', 'personnel_expertises.expertise_id = e.id')
+                ->where(['p.status' => 1])
+                ->andFilterWhere($filter)
+                ->groupBy('personnel_expertises.expertise_id')
+                ->orderBy(['total' => SORT_DESC])
+                ->limit(10)
+                ->asArray()->all();
+        }
+
+        // Keep original variables for BC or compatibility if needed, but updated to Active Only
+        $personnelByDept = $personnelStatsByTrack['total']['dept'];
+        $personnelByContract = $personnelStatsByTrack['total']['contract'];
+        $personnelByTrack = $personnelStatsByTrack['total']['track'];
+        $personnelByAcademicPosition = $personnelStatsByTrack['total']['academicPosition'];
+        $personnelByJobPosition = $personnelStatsByTrack['total']['jobPosition'];
+        $personnelByQualification = $personnelStatsByTrack['total']['qualification'];
+        $certByLevel = $personnelStatsByTrack['total']['cert'];
+        $topExpertises = $personnelStatsByTrack['total']['expertise'];
         // นักเรียนทุนแยกตามคุณวุฒิ
         $scholarByQualification = Scholarship::find()
             ->select(['q.name as label', 'COUNT(*) as total'])
@@ -475,8 +591,11 @@ class DashboardController extends Controller
             'retentionRate' => $retentionRate,
             'totalPersonnel' => $totalPersonnel,
             'activePersonnel' => $activePersonnel,
+            'activeAcademic' => $activeAcademic,
+            'activeOperational' => $activeOperational,
             'personnelRetentionStats' => $personnelRetentionStats,
             'totalScholarships' => $totalScholarships,
+            'scholarshipRetentionStats' => $scholarshipRetentionStats,
             'avgGpax' => round($avgGpax, 2),
             'maxGpax' => round($maxGpax, 2),
             'minGpax' => round($minGpax, 2),
@@ -504,7 +623,7 @@ class DashboardController extends Controller
             'scholarByMajor' => $scholarByMajor,
             'scholarByInstitution' => $scholarByInstitution,
             'certByLevel' => $certByLevel,
-            'topExpertises' => $topExpertises,
+            'personnelStatsByTrack' => $personnelStatsByTrack,
             // research & academic service
             'totalResearch' => $totalResearch,
             'researchByStatus' => $researchByStatus,

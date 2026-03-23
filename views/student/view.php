@@ -67,6 +67,12 @@ $statusLabels = \app\models\Student::getStatusList();
                 </dd>
             </div>
             <div>
+                <dt class="text-sm font-medium text-gray-500">ปีที่จบการศึกษา</dt>
+                <dd class="text-sm text-gray-900 mt-1">
+                    <?= $model->graduation_year ? $model->graduation_year . ' (พ.ศ.)' : '-' ?>
+                </dd>
+            </div>
+            <div>
                 <dt class="text-sm font-medium text-gray-500">อาจารย์ที่ปรึกษา</dt>
                 <dd class="text-sm text-gray-900 mt-1">
                     <?= $model->advisor ? Html::encode($model->advisor->fullname) : '-' ?>

@@ -19,11 +19,11 @@ $statusList = \app\models\ExamResult::getStatusList();
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">เลือกรหัส <span
+            <label class="block text-sm font-medium text-gray-700 mb-1">ปีที่จบการศึกษา <span
                     class="text-red-500">*</span></label>
-            <select x-model="selectedBatch" @change="loadStudents()" class="<?= $inputClass ?>">
-                <option value="">-- เลือกรหัส --</option>
-                <?php foreach ($batches as $key => $label): ?>
+            <select x-model="selectedYear" @change="loadStudents()" class="<?= $inputClass ?>">
+                <option value="">-- เลือกปีที่จบ --</option>
+                <?php foreach ($years as $key => $label): ?>
                     <option value="<?= Html::encode($key) ?>">
                         <?= Html::encode($label) ?>
                     </option>
@@ -43,7 +43,7 @@ $statusList = \app\models\ExamResult::getStatusList();
             </select>
         </div>
         <div class="flex items-end">
-            <button @click="loadStudents()" :disabled="!selectedBatch"
+            <button @click="loadStudents()" :disabled="!selectedYear"
                 class="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition font-medium text-sm">
                 🔍 โหลดรายชื่อ
             </button>
@@ -68,7 +68,7 @@ $statusList = \app\models\ExamResult::getStatusList();
             <div class="mb-4 flex items-center justify-between">
                 <p class="text-sm text-gray-600">
                     พบนักศึกษา <span class="font-bold text-indigo-600" x-text="students.length"></span> คน
-                    ในรหัส <span class="font-bold" x-text="selectedBatch"></span>
+                    ในปีที่จบ <span class="font-bold" x-text="selectedYear"></span>
                 </p>
                 <button type="submit" :disabled="!selectedRound"
                     class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition font-medium shadow-sm">
@@ -116,8 +116,9 @@ $statusList = \app\models\ExamResult::getStatusList();
                                         <select :name="'ExamResult[' + s.student_id + '][subject_<?= $i ?>_score]'"
                                             class="w-full rounded border-gray-300 px-1 py-1 text-sm border focus:border-indigo-500">
                                             <option value="">--</option>
-                                            <option value="P">ผ่าน</option>
-                                            <option value="F">ไม่ผ่าน</option>
+                                            <?php foreach (\app\models\ExamResult::getPassFailList() as $k => $v): ?>
+                                                <option value="<?= $k ?>"><?= $v ?></option>
+                                            <?php endforeach; ?>
                                         </select>
                                     </td>
                                 <?php endfor; ?>
@@ -151,8 +152,8 @@ $statusList = \app\models\ExamResult::getStatusList();
     <!-- Empty state -->
     <template x-if="students.length === 0 && !loading && attempted">
         <div class="text-center py-8 text-gray-400">
-            <p class="text-lg">ไม่พบนักศึกษาในรหัสที่เลือก</p>
-            <p class="text-sm mt-1">กรุณาตรวจสอบว่ามีการเพิ่มนักศึกษาในรหัสนี้แล้ว</p>
+            <p class="text-lg">ไม่พบนักศึกษาในปีที่จบที่เลือก</p>
+            <p class="text-sm mt-1">กรุณาตรวจสอบว่ามีการเพิ่มนักศึกษาได้รับปีที่จบการศึกษานี้แล้ว</p>
         </div>
     </template>
 </div>
@@ -162,7 +163,7 @@ $statusList = \app\models\ExamResult::getStatusList();
 <script>
     function batchExam() {
         return {
-            selectedBatch: '',
+            selectedYear: '',
             selectedRound: '',
             students: [],
             loading: false,
@@ -170,11 +171,11 @@ $statusList = \app\models\ExamResult::getStatusList();
             csrfToken: '<?= Yii::$app->request->csrfToken ?>',
             init() { },
             async loadStudents() {
-                if (!this.selectedBatch) return;
+                if (!this.selectedYear) return;
                 this.loading = true;
                 this.attempted = true;
                 try {
-                    const res = await fetch('<?= \yii\helpers\Url::to(['get-students']) ?>&batch=' + encodeURIComponent(this.selectedBatch));
+                    const res = await fetch('<?= \yii\helpers\Url::to(['get-students']) ?>&graduation_year=' + encodeURIComponent(this.selectedYear));
                     this.students = await res.json();
                 } catch (e) {
                     this.students = [];

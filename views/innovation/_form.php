@@ -33,7 +33,7 @@ use yii\helpers\Url;
                 <div class="md:col-span-2">
                     <?= $form->field($model, 'name')->textInput(['placeholder' => 'ระบุชื่อนวัตกรรม']) ?>
                 </div>
-                <?= $form->field($model, 'invention_date')->textInput(['type' => 'date']) ?>
+                <?= $form->field($model, 'invention_date')->textInput(['class' => 'w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-50/50 focus:border-indigo-500 transition-all outline-none bg-gray-50/30 datepicker-be']) ?>
                 <?= $form->field($model, 'advisor')->textInput(['placeholder' => 'ระบุชื่ออาจารย์ที่ปรึกษา']) ?>
             </div>
 

@@ -129,11 +129,11 @@ $textareaClass = $inputClass . ' min-h-[80px]';
         <div class="grid grid-cols-1 gap-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">วันที่เริ่ม</label>
-                <?= $form->field($model, 'start_date')->textInput(['class' => $inputClass, 'type' => 'date'])->label(false) ?>
+                <?= $form->field($model, 'start_date')->textInput(['class' => $inputClass . ' datepicker-be'])->label(false) ?>
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">วันที่สิ้นสุด</label>
-                <?= $form->field($model, 'end_date')->textInput(['class' => $inputClass, 'type' => 'date'])->label(false) ?>
+                <?= $form->field($model, 'end_date')->textInput(['class' => $inputClass . ' datepicker-be'])->label(false) ?>
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">กลุ่มผู้รับบริการ / พื้นที่จัดกิจกรรม</label>

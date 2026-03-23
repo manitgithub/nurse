@@ -96,9 +96,9 @@ class ExamResultController extends Controller
     }
 
     /**
-     * AJAX: Get students by batch (Excluding those who already passed)
+     * AJAX: Get students by graduation year (Excluding those who already passed)
      */
-    public function actionGetStudents($batch)
+    public function actionGetStudents($graduation_year)
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
@@ -109,7 +109,7 @@ class ExamResultController extends Controller
             ->column();
 
         $students = Student::find()
-            ->where(['batch' => $batch])
+            ->where(['graduation_year' => $graduation_year])
             ->andWhere(['not in', 'student_id', $passedStudentIds])
             ->orderBy(['student_id' => SORT_ASC])
             ->asArray()
@@ -118,11 +118,11 @@ class ExamResultController extends Controller
     }
 
     /**
-     * Batch create exam results for all students in a batch
+     * Batch create exam results for all students in a graduation year
      */
     public function actionBatchCreate()
     {
-        $batches = Student::getBatchList();
+        $years = Student::getGraduationYearList();
         $rounds = ArrayHelper::map(ExamRound::find()->orderBy(['year' => SORT_DESC, 'round_number' => SORT_DESC])->all(), 'id', function ($model) {
             return "ปี {$model->year} รอบที่ {$model->round_number}";
         });
@@ -181,7 +181,7 @@ class ExamResultController extends Controller
         }
 
         return $this->render('batch-create', [
-            'batches' => $batches,
+            'years' => $years,
             'rounds' => $rounds,
         ]);
     }

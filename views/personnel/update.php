@@ -7,4 +7,12 @@ $this->title = 'แก้ไข: ' . $model->fullname;
         <?= Html::encode($this->title) ?>
     </h1>
 </div>
-<?= $this->render('_form', ['model' => $model, 'qualifications' => $qualifications, 'contractTypes' => $contractTypes, 'departments' => $departments]) ?>
+<?= $this->render('_form', [
+    'model' => $model,
+    'qualifications' => $qualifications,
+    'contractTypes' => $contractTypes,
+    'departments' => $departments,
+    'subjectGroups' => $subjectGroups,
+    'expertiseList' => $expertiseList,
+    'selectedExpertises' => $selectedExpertises,
+]) ?>

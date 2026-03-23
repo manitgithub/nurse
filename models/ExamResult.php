@@ -29,7 +29,7 @@ class ExamResult extends ActiveRecord
                     'subject_8_score',
                 ],
                 'in',
-                'range' => ['P', 'F']
+                'range' => ['P', 'F', 'N']
             ],
             [['status'], 'string', 'max' => 50],
             [['student_id'], 'exist', 'targetClass' => Student::class, 'targetAttribute' => 'student_id'],
@@ -97,6 +97,7 @@ class ExamResult extends ActiveRecord
         return [
             'P' => 'ผ่าน',
             'F' => 'ไม่ผ่าน',
+            'N' => 'ไม่สอบในรอบนี้',
         ];
     }
 

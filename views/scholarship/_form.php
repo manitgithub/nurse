@@ -34,11 +34,11 @@ $inputClass = 'w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-5
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">วันเริ่มต้น</label>
-            <?= $form->field($model, 'start_date')->textInput(['class' => $inputClass, 'type' => 'date'])->label(false) ?>
+            <?= $form->field($model, 'start_date')->textInput(['class' => $inputClass . ' datepicker-be'])->label(false) ?>
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">วันสิ้นสุด</label>
-            <?= $form->field($model, 'end_date')->textInput(['class' => $inputClass, 'type' => 'date'])->label(false) ?>
+            <?= $form->field($model, 'end_date')->textInput(['class' => $inputClass . ' datepicker-be'])->label(false) ?>
         </div>
     </div>
     <div class="flex justify-end space-x-3 pt-4 border-t">

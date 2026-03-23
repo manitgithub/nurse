@@ -8,6 +8,33 @@ use yii\helpers\Url;
 
 $this->title = $model->name;
 ?>
+<?php
+if (!function_exists('_formatDateSafe')) {
+    function _formatDateSafe($dateStr)
+    {
+        if (empty($dateStr)) return '-';
+        $s = trim((string)$dateStr);
+        $d = $mo = $y = null;
+        if (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $s, $m)) {
+            $y = (int)$m[1]; $mo = (int)$m[2]; $d = (int)$m[3];
+        } elseif (preg_match('/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/', $s, $m)) {
+            $d = (int)$m[1]; $mo = (int)$m[2]; $y = (int)$m[3];
+        } elseif (preg_match('/(19|20|25)\d{2}/', $s, $m)) {
+            $y = (int)$m[0]; if ($y > 2400) $y -= 543; $mo = 1; $d = 1;
+        } else {
+            try {
+                $dt = new DateTime($s);
+                $y = (int)$dt->format('Y'); $mo = (int)$dt->format('n'); $d = (int)$dt->format('j');
+            } catch (Exception $e) {
+                return '-';
+            }
+        }
+        $months = [1=>'January',2=>'February',3=>'March',4=>'April',5=>'May',6=>'June',7=>'July',8=>'August',9=>'September',10=>'October',11=>'November',12=>'December'];
+        return sprintf('%d %s %d', $d, $months[$mo] ?? $mo, $y);
+    }
+}
+?>
+
 <div class="max-w-5xl mx-auto py-10 px-4">
     <div class="flex items-center justify-between mb-8">
         <div class="flex items-center space-x-4">

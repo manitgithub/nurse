@@ -38,8 +38,8 @@ $this->title = 'บันทึก UKPSF แบบกลุ่ม';
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">วันที่ได้รับ</label>
-                <input type="date" x-model="bulk.date"
-                    class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 text-sm">
+                <input type="text" x-model="bulk.date"
+                    class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 text-sm datepicker-be">
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">รหัสที่อบรม</label>
@@ -104,9 +104,9 @@ $this->title = 'บันทึก UKPSF แบบกลุ่ม';
                                     </select>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <input type="date" :name="'Certifications[' + p.id + '][certified_date]'"
+                                    <input type="text" :name="'Certifications[' + p.id + '][certified_date]'"
                                         x-model="p.certified_date"
-                                        class="w-full px-2 py-1 border border-gray-200 rounded text-sm focus:border-indigo-500">
+                                        class="w-full px-2 py-1 border border-gray-200 rounded text-sm focus:border-indigo-500 datepicker-be">
                                 </td>
                                 <td class="px-6 py-4">
                                     <input type="text" :name="'Certifications[' + p.id + '][training_batch]'"

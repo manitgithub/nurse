@@ -51,6 +51,13 @@ use yii\helpers\ArrayHelper;
                 <label class="block text-sm font-medium text-gray-700 mb-1">สถานะ</label>
                 <?= $form->field($model, 'status')->dropDownList(\app\models\Student::getStatusList(), ['class' => 'w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-3 py-2 border', 'prompt' => '-- เลือก --'])->label(false) ?>
             </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">ปีที่จบการศึกษา (พ.ศ.)</label>
+                <?= $form->field($model, 'graduation_year')->textInput(['class' => 'w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-3 py-2 border', 'type' => 'number', 'min' => '2500', 'max' => '2600', 'placeholder' => 'เช่น 2567'])->label(false) ?>
+            </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">อาจารย์ที่ปรึกษา</label>
                 <?php

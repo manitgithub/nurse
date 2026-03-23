@@ -26,6 +26,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -165,6 +166,55 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
         </footer>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/th.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            function initDatepickers() {
+                const updateYear = function(instance) {
+                    if (!instance.calendarContainer) return;
+                    const yearInput = instance.calendarContainer.querySelector('.numInput.cur-year');
+                    if (yearInput) {
+                        yearInput.value = parseInt(instance.currentYear) + 543;
+                    }
+                };
+
+                flatpickr('.datepicker-be', {
+                    altInput: true,
+                    altFormat: 'j M Y',
+                    dateFormat: 'Y-m-d',
+                    locale: 'th',
+                    onReady: function(selectedDates, dateStr, instance) { updateYear(instance); },
+                    onOpen: function(selectedDates, dateStr, instance) { updateYear(instance); },
+                    onYearChange: function(selectedDates, dateStr, instance) { updateYear(instance); },
+                    onMonthChange: function(selectedDates, dateStr, instance) { updateYear(instance); },
+                    onValueUpdate: function(selectedDates, dateStr, instance) { updateYear(instance); },
+                    formatDate: function(date, format, locale) {
+                        if (format === 'Y-m-d') {
+                            const y = date.getFullYear();
+                            const m = String(date.getMonth() + 1).padStart(2, '0');
+                            const d = String(date.getDate()).padStart(2, '0');
+                            return `${y}-${m}-${d}`;
+                        }
+                        if (format === 'j M Y') {
+                            const d = date.getDate();
+                            const m = locale.months.shorthand[date.getMonth()];
+                            const y = date.getFullYear() + 543;
+                            return `${d} ${m} ${y}`;
+                        }
+                        const year_ce = date.getFullYear();
+                        const year_be = year_ce + 543;
+                        return flatpickr.formatDate(date, format).replace(year_ce.toString(), year_be.toString());
+                    }
+                });
+            }
+            initDatepickers();
+            // Re-initialize if Alpine or Livewire DOM changes happen
+            document.addEventListener('alpine:initialized', function() {
+                // If there are dynamic fields
+            });
+        });
+    </script>
     <?php $this->endBody() ?>
 </body>
 

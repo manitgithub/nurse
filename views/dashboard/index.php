@@ -45,9 +45,12 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-500">บุคลากรทั้งหมด</p>
-                    <p class="text-3xl font-bold text-gray-900 mt-1"><?= $totalPersonnel ?></p>
-                    <p class="text-sm text-green-600 mt-1">ปฏิบัติงาน: <?= $activePersonnel ?></p>
+                    <p class="text-sm font-medium text-gray-500">บุคลากร (ปฏิบัติงาน)</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-1"><?= $activePersonnel ?></p>
+                    <div class="flex space-x-3 text-sm mt-1">
+                        <span class="text-indigo-600 font-medium">สาย ว: <?= $activeAcademic ?></span>
+                        <span class="text-emerald-600 font-medium">สาย ป: <?= $activeOperational ?></span>
+                    </div>
                 </div>
                 <div class="bg-emerald-100 rounded-xl p-3">
                     <svg class="h-8 w-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -107,6 +110,9 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
             }
             if (this.activeTab === 'innovation' && window.innovationYearlyChart) {
                 setTimeout(() => window.innovationYearlyChart.resize(), 100);
+            }
+            if (this.activeTab === 'scholarship' && window.scholarshipRetentionChart) {
+                setTimeout(() => window.scholarshipRetentionChart.resize(), 100);
             }
             if (this.activeTab === 'budget' && window.budgetComparisonChart) {
                 setTimeout(() => window.budgetComparisonChart.resize(), 100);
@@ -955,6 +961,14 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
                     </div>
                 </div>
 
+                <!-- 5-Year Scholarship Retention -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">📈 จำนวนนักเรียนทุนย้อนหลัง 5 ปี (ตามอายุสัญญา)</h3>
+                    <div class="h-[300px]">
+                        <canvas id="scholarshipRetentionChart"></canvas>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
                     <!-- Scholarship by Major -->
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -1334,7 +1348,7 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
             // ===== PERSONNEL TAB CHARTS =====
 
             <?php if (!empty($personnelByDept)): ?>
-                new Chart(document.getElementById('deptChart'), {
+                window.deptChart = new Chart(document.getElementById('deptChart'), {
                     type: 'bar',
                     data: {
                         labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $personnelByDept)) ?>,
@@ -1345,7 +1359,7 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
             <?php endif; ?>
 
             <?php if (!empty($personnelByContract)): ?>
-                new Chart(document.getElementById('contractChart'), {
+                window.contractChart = new Chart(document.getElementById('contractChart'), {
                     type: 'bar',
                     data: {
                         labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $personnelByContract)) ?>,
@@ -1356,7 +1370,7 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
             <?php endif; ?>
 
             <?php if (!empty($personnelByQualification)): ?>
-                new Chart(document.getElementById('qualChart'), {
+                window.qualChart = new Chart(document.getElementById('qualChart'), {
                     type: 'doughnut',
                     data: {
                         labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $personnelByQualification)) ?>,
@@ -1367,7 +1381,7 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
             <?php endif; ?>
 
             <?php if (!empty($certByLevel)): ?>
-                new Chart(document.getElementById('certChart'), {
+                window.certChart = new Chart(document.getElementById('certChart'), {
                     type: 'bar',
                     data: {
                         labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $certByLevel)) ?>,
@@ -1378,7 +1392,7 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
             <?php endif; ?>
 
             <?php if (!empty($topExpertises)): ?>
-                new Chart(document.getElementById('expertiseChart'), {
+                window.expertiseChart = new Chart(document.getElementById('expertiseChart'), {
                     type: 'bar',
                     data: {
                         labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $topExpertises)) ?>,
@@ -1389,7 +1403,7 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
             <?php endif; ?>
 
             <?php if (!empty($personnelByTrack)): ?>
-                new Chart(document.getElementById('trackChart'), {
+                window.trackChart = new Chart(document.getElementById('trackChart'), {
                     type: 'doughnut',
                     data: {
                         labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $personnelByTrack)) ?>,
@@ -1400,7 +1414,7 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
             <?php endif; ?>
 
             <?php if (!empty($personnelByAcademicPosition)): ?>
-                new Chart(document.getElementById('academicPosChart'), {
+                window.academicPosChart = new Chart(document.getElementById('academicPosChart'), {
                     type: 'bar',
                     data: {
                         labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $personnelByAcademicPosition)) ?>,
@@ -1411,7 +1425,7 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
             <?php endif; ?>
 
             <?php if (!empty($personnelByJobPosition)): ?>
-                new Chart(document.getElementById('jobPosChart'), {
+                window.jobPosChart = new Chart(document.getElementById('jobPosChart'), {
                     type: 'bar',
                     data: {
                         labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $personnelByJobPosition)) ?>,
@@ -1420,6 +1434,62 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
                     options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } } }
                 });
             <?php endif; ?>
+
+            // Data for dynamic updates (Personnel)
+            var personnelStatsByTrack = <?= Json::encode($personnelStatsByTrack) ?>;
+
+            window.updateAllPersonnelCharts = function (trackKey) {
+                var data = personnelStatsByTrack[trackKey] || {};
+
+                // 1. Dept Chart
+                if (window.deptChart) {
+                    window.deptChart.data.labels = data.dept.map(r => r.label || 'ไม่ระบุ');
+                    window.deptChart.data.datasets[0].data = data.dept.map(r => parseInt(r.total));
+                    window.deptChart.update();
+                }
+
+                // 2. Contract Chart
+                if (window.contractChart) {
+                    window.contractChart.data.labels = data.contract.map(r => r.label || 'ไม่ระบุ');
+                    window.contractChart.data.datasets[0].data = data.contract.map(r => parseInt(r.total));
+                    window.contractChart.update();
+                }
+
+                // 3. Qual Chart
+                if (window.qualChart) {
+                    window.qualChart.data.labels = data.qualification.map(r => r.label || 'ไม่ระบุ');
+                    window.qualChart.data.datasets[0].data = data.qualification.map(r => parseInt(r.total));
+                    window.qualChart.update();
+                }
+
+                // 4. Cert Chart
+                if (window.certChart) {
+                    window.certChart.data.labels = data.cert.map(r => r.label || 'ไม่ระบุ');
+                    window.certChart.data.datasets[0].data = data.cert.map(r => parseInt(r.total));
+                    window.certChart.update();
+                }
+
+                // 5. Academic Position Chart
+                if (window.academicPosChart) {
+                    window.academicPosChart.data.labels = data.academicPosition.map(r => r.label || 'ไม่ระบุ');
+                    window.academicPosChart.data.datasets[0].data = data.academicPosition.map(r => parseInt(r.total));
+                    window.academicPosChart.update();
+                }
+
+                // 6. Job Position Chart
+                if (window.jobPosChart) {
+                    window.jobPosChart.data.labels = data.jobPosition.map(r => r.label || 'ไม่ระบุ');
+                    window.jobPosChart.data.datasets[0].data = data.jobPosition.map(r => parseInt(r.total));
+                    window.jobPosChart.update();
+                }
+
+                // 7. Expertise Chart
+                if (window.expertiseChart) {
+                    window.expertiseChart.data.labels = data.expertise.map(r => r.label || 'ไม่ระบุ');
+                    window.expertiseChart.data.datasets[0].data = data.expertise.map(r => parseInt(r.total));
+                    window.expertiseChart.update();
+                }
+            };
 
             // ===== WORK TAB CHARTS =====
 
@@ -1668,6 +1738,46 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
                         },
                         scales: {
                             y: { beginAtZero: true, ticks: { precision: 0 } },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            <?php endif; ?>
+            
+            // Scholarship 5-Year Retention Chart
+            <?php if (!empty($scholarshipRetentionStats)): ?>
+                window.scholarshipRetentionChart = new Chart(document.getElementById('scholarshipRetentionChart'), {
+                    type: 'line',
+                    data: {
+                        labels: <?= Json::encode(array_keys($scholarshipRetentionStats)) ?>,
+                        datasets: [{
+                            label: 'จำนวนนักเรียนทุน (คน)',
+                            data: <?= Json::encode(array_values($scholarshipRetentionStats)) ?>,
+                            borderColor: '#f59e0b', // Amber
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            pointBackgroundColor: '#f59e0b',
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            borderWidth: 3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        return 'จำนวน: ' + context.parsed.y + ' คน';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, ticks: { precision: 0, stepSize: 1 } },
                             x: { grid: { display: false } }
                         }
                     }

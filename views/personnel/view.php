@@ -3,6 +3,40 @@ use yii\helpers\Html;
 $this->title = $model->fullname;
 $genderLabels = \app\models\Personnel::getGenderList();
 ?>
+<?php
+// Small helper to avoid using strtotime() on platforms where epoch may overflow (32-bit)
+if (!function_exists('_isDatePast')) {
+    function _isDatePast($dateStr)
+    {
+        if (empty($dateStr)) return false;
+        $s = trim((string)$dateStr);
+        // ISO yyyy-mm-dd
+        if (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $s, $m)) {
+            $y = (int)$m[1]; $mo = (int)$m[2]; $d = (int)$m[3];
+        } elseif (preg_match('/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/', $s, $m)) {
+            // dd/mm/yyyy
+            $d = (int)$m[1]; $mo = (int)$m[2]; $y = (int)$m[3];
+        } elseif (preg_match('/(19|20|25)\d{2}/', $s, $m)) {
+            $y = (int)$m[0]; if ($y > 2400) $y -= 543; $mo = 1; $d = 1;
+        } else {
+            try {
+                $dt = new DateTime($s);
+                $y = (int)$dt->format('Y'); $mo = (int)$dt->format('n'); $d = (int)$dt->format('j');
+            } catch (Exception $e) {
+                return false;
+            }
+        }
+        $nowY = (int)date('Y'); $nowM = (int)date('n'); $nowD = (int)date('j');
+        if ($y < $nowY) return true;
+        if ($y > $nowY) return false;
+        if ($mo < $nowM) return true;
+        if ($mo > $nowM) return false;
+        return $d < $nowD;
+    }
+}
+$isExpired = $model->license_expire_date ? _isDatePast($model->license_expire_date) : false;
+?>
+
 <div class="mb-6 flex items-center justify-between">
     <h1 class="text-2xl font-bold text-gray-900">👤
         <?= Html::encode($this->title) ?>
@@ -154,9 +188,9 @@ $genderLabels = \app\models\Personnel::getGenderList();
                 <span
                     class="block text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1">วันหมดอายุ</span>
                 <span
-                    class="text-sm font-bold <?= $model->license_expire_date && strtotime($model->license_expire_date) < time() ? 'text-red-500' : 'text-gray-900' ?>">
+                    class="text-sm font-bold <?= $isExpired ? 'text-red-500' : 'text-gray-900' ?>">
                     <?= $model->license_expire_date ?: '-' ?>
-                    <?php if ($model->license_expire_date && strtotime($model->license_expire_date) < time()): ?>
+                    <?php if ($isExpired): ?>
                         <span class="ml-2 text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded">EXPIRED</span>
                     <?php endif; ?>
                 </span>

@@ -37,10 +37,14 @@ $this->title = 'จัดการบุคลากร';
 
 <!-- Filter Form -->
 <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm mb-6">
+    <div class="flex items-center space-x-2 mb-4 border-b border-gray-100 pb-2">
+        <span class="text-lg">🔍</span>
+        <h2 class="text-sm font-bold text-gray-700 uppercase tracking-wider">ตัวกรองข้อมูล</h2>
+    </div>
     <?php $form = ActiveForm::begin([
         'action' => ['index'],
         'method' => 'get',
-        'options' => ['class' => 'grid grid-cols-1 md:grid-cols-6 gap-4 items-end']
+        'options' => ['class' => 'grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-x-4 gap-y-2 items-end']
     ]); ?>
 
     <div class="md:col-span-1">
@@ -77,6 +81,49 @@ $this->title = 'จัดการบุคลากร';
         <?= $form->field($searchModel, 'status')->dropDownList([1 => 'ปฏิบัติงาน', 0 => 'ไม่ปฏิบัติงาน'], ['prompt' => 'ทั้งหมด', 'class' => 'w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm py-2'])->label(false) ?>
     </div>
 
+    <div class="md:col-span-1">
+        <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">เพศ</label>
+        <?= $form->field($searchModel, 'gender')->dropDownList(\app\models\Personnel::getGenderList(), ['prompt' => 'ทั้งหมด', 'class' => 'w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm py-2'])->label(false) ?>
+    </div>
+
+    <div class="md:col-span-1">
+        <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">ตำแหน่งวิชาการ</label>
+        <?= $form->field($searchModel, 'academic_position')->dropDownList(\app\models\Personnel::getAcademicPositionList(), ['prompt' => 'ทั้งหมด', 'class' => 'w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm py-2'])->label(false) ?>
+    </div>
+
+    <div class="md:col-span-1">
+        <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">คุณวุฒิ</label>
+        <?= $form->field($searchModel, 'qualification_id')->dropDownList(\yii\helpers\ArrayHelper::map(\app\models\Qualification::find()->all(), 'id', 'name'), ['prompt' => 'ทั้งหมด', 'class' => 'w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm py-2'])->label(false) ?>
+    </div>
+
+    <div class="md:col-span-1">
+        <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">ประเภทสัญญา</label>
+        <?= $form->field($searchModel, 'contract_type_id')->dropDownList(\yii\helpers\ArrayHelper::map(\app\models\ContractType::find()->all(), 'id', 'name'), ['prompt' => 'ทั้งหมด', 'class' => 'w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm py-2'])->label(false) ?>
+    </div>
+
+    <div class="md:col-span-1">
+        <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">ปีที่ลาออก</label>
+        <?= $form->field($searchModel, 'resignation_year')->textInput(['placeholder' => 'พ.ศ.', 'class' => 'w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm py-2'])->label(false) ?>
+    </div>
+
+    <div class="md:col-span-1">
+        <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">ความเชี่ยวชาญ</label>
+        <?= $form->field($searchModel, 'expertise_id')->dropDownList(\yii\helpers\ArrayHelper::map(\app\models\Expertise::find()->orderBy('name')->all(), 'id', 'name'), ['prompt' => 'ทั้งหมด', 'class' => 'w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm py-2'])->label(false) ?>
+    </div>
+
+    <div class="md:col-span-1">
+        <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">ปฏิบัติงานปี (พ.ศ.)</label>
+        <?php
+        $currentYearBE = date('Y') + 543;
+        $yearsBE = [];
+        for ($i = 0; $i < 5; $i++) {
+            $y = $currentYearBE - $i;
+            $yearsBE[$y] = $y;
+        }
+        ?>
+        <?= $form->field($searchModel, 'active_year_be')->dropDownList($yearsBE, ['prompt' => 'เลือกปี...', 'class' => 'w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm py-2 font-bold text-indigo-600 border-indigo-200 bg-indigo-50/30'])->label(false) ?>
+    </div>
+
     <div class="flex space-x-2">
         <?= Html::submitButton('🔍', ['class' => 'bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg shadow-sm transition flex-1']) ?>
         <?= Html::a('ล้าง', ['index'], ['class' => 'bg-gray-100 hover:bg-gray-200 text-gray-600 font-medium py-2 px-4 rounded-lg shadow-sm transition']) ?>
@@ -84,60 +131,31 @@ $this->title = 'จัดการบุคลากร';
 
     <?php ActiveForm::end(); ?>
 </div>
-<div class="bg-white shadow-sm rounded-xl overflow-hidden border border-gray-200">
-    <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-            <tr>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">รหัส</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">ตำแหน่งงาน</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">ชื่อ-นามสกุล</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">สาขา / กลุ่มวิชา</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">ประเภทสัญญา</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">สถานะ</th>
-                <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">จัดการ</th>
-            </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200">
-            <?php foreach ($dataProvider->getModels() as $model): ?>
-                <tr class="hover:bg-gray-50 transition">
-                    <td class="px-6 py-4 text-sm font-medium text-indigo-600">
-                        <?= Html::encode($model->personnel_code) ?>
-                    </td>
-                    <td class="px-6 py-4 text-sm text-gray-500">
-                        <?= Html::encode($model->job_position ?? '-') ?>
-                    </td>
-                    <td class="px-6 py-4 text-sm text-gray-900">
-                        <?= Html::encode($model->fullname) ?>
-                    </td>
-                    <td class="px-6 py-4 text-sm text-gray-500">
-                        <?= Html::encode($model->department->name ?? '-') ?>
-                        <br>
-                        <span class="text-xs text-indigo-500"><?= Html::encode($model->subjectGroup->name ?? '') ?></span>
-                    </td>
-                    <td class="px-6 py-4 text-sm text-gray-500">
-                        <?= Html::encode($model->contractType->name ?? '-') ?>
-                    </td>
-                    <td class="px-6 py-4">
-                        <span
-                            class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium <?= $model->status ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' ?>">
-                            <?= $model->status ? 'ปฏิบัติงาน' : 'ไม่ปฏิบัติงาน' ?>
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 text-right text-sm space-x-2">
-                        <?= Html::a('ดู', ['view', 'id' => $model->id], ['class' => 'text-indigo-600 hover:text-indigo-900 font-medium']) ?>
-                        <?= Html::a('แก้ไข', ['update', 'id' => $model->id], ['class' => 'text-amber-600 hover:text-amber-900 font-medium']) ?>
-                        <?= Html::a('ลบ', ['delete', 'id' => $model->id], ['class' => 'text-red-600 hover:text-red-900 font-medium', 'data' => ['confirm' => 'ลบ?', 'method' => 'post']]) ?>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-            <?php if ($dataProvider->getTotalCount() == 0): ?>
-                <tr>
-                    <td colspan="6" class="px-6 py-8 text-center text-gray-400">ยังไม่มีข้อมูล</td>
-                </tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
-</div>
-<div class="mt-4">
-    <?= \yii\widgets\LinkPager::widget(['pagination' => $dataProvider->pagination, 'options' => ['class' => 'flex space-x-1 justify-center'], 'linkOptions' => ['class' => 'px-3 py-1 rounded bg-white border border-gray-300 text-sm hover:bg-indigo-50']]) ?>
+
+<div x-data="{ activeTab: '<?= Yii::$app->request->get('p-page') ? 'operational' : 'academic' ?>' }">
+    <!-- Tabs Navigation -->
+    <div class="flex space-x-1 bg-gray-100 p-1 rounded-xl mb-6 max-w-md">
+        <button @click="activeTab = 'academic'" 
+            :class="activeTab === 'academic' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500 hover:text-gray-700'"
+            class="flex-1 py-2 px-4 rounded-lg text-sm font-bold transition flex items-center justify-center space-x-2">
+            <span>📚 สาย ว (วิชาการ)</span>
+            <span class="bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full text-[10px]"><?= number_format($academicDataProvider->getTotalCount()) ?></span>
+        </button>
+        <button @click="activeTab = 'operational'" 
+            :class="activeTab === 'operational' ? 'bg-white shadow-sm text-amber-600' : 'text-gray-500 hover:text-gray-700'"
+            class="flex-1 py-2 px-4 rounded-lg text-sm font-bold transition flex items-center justify-center space-x-2">
+            <span>🛠️ สาย ป (ปฏิบัติการ)</span>
+            <span class="bg-amber-100 text-amber-600 px-2 py-0.5 rounded-full text-[10px]"><?= number_format($operationalDataProvider->getTotalCount()) ?></span>
+        </button>
+    </div>
+
+    <!-- Academic Table -->
+    <div x-show="activeTab === 'academic'" x-transition>
+        <?= $this->render('_list_table', ['dataProvider' => $academicDataProvider]) ?>
+    </div>
+
+    <!-- Operational Table -->
+    <div x-show="activeTab === 'operational'" x-transition x-cloak>
+        <?= $this->render('_list_table', ['dataProvider' => $operationalDataProvider]) ?>
+    </div>
 </div>

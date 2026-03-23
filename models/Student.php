@@ -20,7 +20,7 @@ class Student extends ActiveRecord
             [['fullname', 'high_school', 'hometown'], 'string', 'max' => 255],
             [['gpax_hs'], 'number', 'min' => 0, 'max' => 4],
             [['status'], 'string', 'max' => 50],
-            [['advisor_id'], 'integer'],
+            [['advisor_id', 'graduation_year'], 'integer'],
             [['student_id'], 'unique'],
             [['advisor_id'], 'exist', 'targetClass' => Personnel::class, 'targetAttribute' => 'id'],
         ];
@@ -37,6 +37,7 @@ class Student extends ActiveRecord
             'hometown' => 'ภูมิลำเนา',
             'status' => 'สถานะ',
             'advisor_id' => 'อาจารย์ที่ปรึกษา',
+            'graduation_year' => 'ปีที่จบการศึกษา',
         ];
     }
 
@@ -153,6 +154,25 @@ class Student extends ActiveRecord
             ->andWhere(['!=', 'batch', ''])
             ->orderBy(['batch' => SORT_DESC])
             ->column();
-        return array_combine($batches, array_map(fn($b) => "รหัส $b", $batches));
+
+        $result = [];
+        foreach ($batches as $b) {
+            $result[$b] = $b;
+        }
+        return $result;
+    }
+
+    /**
+     * Get distinct graduation year list for dropdown
+     */
+    public static function getGraduationYearList()
+    {
+        $years = self::find()
+            ->select('graduation_year')
+            ->distinct()
+            ->where(['not', ['graduation_year' => null]])
+            ->orderBy(['graduation_year' => SORT_DESC])
+            ->column();
+        return array_combine($years, array_map(fn($y) => "ปีที่จบ $y", $years));
     }
 }

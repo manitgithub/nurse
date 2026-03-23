@@ -35,7 +35,22 @@ class PersonnelController extends Controller
     public function actionIndex()
     {
         $searchModel = new \app\models\PersonnelSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $params = Yii::$app->request->queryParams;
+        
+        // Load params into search model to capture filters
+        if (!$searchModel->load($params)) {
+             $searchModel->status = 1; // Default to active on first load
+        }
+
+        // Academic Track (สาย ว)
+        $academicDataProvider = $searchModel->search($params);
+        $academicDataProvider->query->andWhere(['track' => 'สาย ว']);
+        $academicDataProvider->pagination->pageParam = 'w-page';
+
+        // Operational Track (สาย ป)
+        $operationalDataProvider = $searchModel->search($params);
+        $operationalDataProvider->query->andWhere(['track' => 'สาย ป']);
+        $operationalDataProvider->pagination->pageParam = 'p-page';
 
         $stats = [
             'total' => Personnel::find()->count(),
@@ -47,7 +62,8 @@ class PersonnelController extends Controller
 
         return $this->render('index', [
             'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
+            'academicDataProvider' => $academicDataProvider,
+            'operationalDataProvider' => $operationalDataProvider,
             'stats' => $stats,
         ]);
     }

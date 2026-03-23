@@ -89,6 +89,7 @@ $this->title = 'จัดการนักศึกษา';
                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">โรงเรียนมัธยม</th>
                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">GPAX มัธยม</th>
                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">อาจารย์ที่ปรึกษา</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">ปีที่จบ</th>
                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">สถานะ</th>
                 <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">จัดการ</th>
             </tr>
@@ -118,6 +119,9 @@ $this->title = 'จัดการนักศึกษา';
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         <?= $model->advisor ? Html::encode($model->advisor->fullname) : '-' ?>
                     </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <?= $model->graduation_year ? $model->graduation_year . ' (พ.ศ.)' : '-' ?>
+                    </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <?php
                         $statusColors = ['active' => 'green', 'inactive' => 'yellow', 'graduated' => 'blue', 'dropped' => 'red'];
@@ -141,7 +145,7 @@ $this->title = 'จัดการนักศึกษา';
             <?php endforeach; ?>
             <?php if ($dataProvider->getTotalCount() == 0): ?>
                 <tr>
-                    <td colspan="7" class="px-6 py-8 text-center text-gray-400">ยังไม่มีข้อมูล</td>
+                    <td colspan="9" class="px-6 py-8 text-center text-gray-400">ยังไม่มีข้อมูล</td>
                 </tr>
             <?php endif; ?>
         </tbody>

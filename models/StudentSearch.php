@@ -18,7 +18,7 @@ class StudentSearch extends Student
     {
         return [
             [['student_id', 'fullname', 'batch', 'status'], 'safe'],
-            [['advisor_id'], 'integer'],
+            [['advisor_id', 'graduation_year'], 'integer'],
         ];
     }
 
@@ -59,6 +59,7 @@ class StudentSearch extends Student
             'batch' => $this->batch,
             'status' => $this->status,
             'advisor_id' => $this->advisor_id,
+            'graduation_year' => $this->graduation_year,
         ]);
 
         $query->andFilterWhere(['like', 'student_id', $this->student_id])
