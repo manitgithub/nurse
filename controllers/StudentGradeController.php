@@ -165,8 +165,9 @@ class StudentGradeController extends Controller
             $successCount = 0;
             foreach ($data as $studentId => $values) {
                 if (isset($values['gpax']) && $values['gpax'] !== '') {
-                    $model = StudentGrade::findOne(['student_id' => $studentId, 'academic_year' => $academicYear]) ?: new StudentGrade();
-                    $model->student_id = $studentId;
+                    $studentIdStr = (string)$studentId;
+                    $model = StudentGrade::findOne(['student_id' => $studentIdStr, 'academic_year' => $academicYear]) ?: new StudentGrade();
+                    $model->student_id = $studentIdStr;
                     $model->academic_year = $academicYear;
                     $model->gpax = $values['gpax'];
                     if ($model->save()) {

@@ -149,10 +149,11 @@ class ExamResultController extends Controller
                         continue;
 
                     // Check if result already exists
-                    $model = ExamResult::findOne(['student_id' => $studentId, 'round_id' => $roundId]);
+                    $studentIdStr = (string)$studentId;
+                    $model = ExamResult::findOne(['student_id' => $studentIdStr, 'round_id' => $roundId]);
                     if (!$model) {
                         $model = new ExamResult();
-                        $model->student_id = $studentId;
+                        $model->student_id = $studentIdStr;
                         $model->round_id = $roundId;
                     }
 
@@ -165,7 +166,7 @@ class ExamResultController extends Controller
                     if ($model->save()) {
                         $saved++;
                     } else {
-                        $errors[] = $studentId . ': ' . implode(', ', $model->getFirstErrors());
+                        $errors[] = $studentIdStr . ': ' . implode(', ', $model->getFirstErrors());
                     }
                 }
                 $transaction->commit();

@@ -2,6 +2,13 @@
 use yii\helpers\Html;
 $this->title = $model->fullname;
 $genderLabels = \app\models\Personnel::getGenderList();
+
+$thaiDate = function($date) {
+    if (empty($date) || $date == '0000-00-00') return '-';
+    $t = strtotime($date);
+    $thai_months = ["", "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+    return date('j', $t) . ' ' . $thai_months[date('n', $t)] . ' ' . (date('Y', $t) + 543);
+};
 ?>
 <?php
 // Small helper to avoid using strtotime() on platforms where epoch may overflow (32-bit)
@@ -94,19 +101,19 @@ $isExpired = $model->license_expire_date ? _isDatePast($model->license_expire_da
         <div>
             <dt class="text-sm font-medium text-gray-500">วันเกิด</dt>
             <dd class="text-sm text-gray-900 mt-1">
-                <?= $model->birth_date ?>
+                <?= $thaiDate($model->birth_date) ?>
             </dd>
         </div>
         <div>
             <dt class="text-sm font-medium text-gray-500">วันเริ่มงาน</dt>
             <dd class="text-sm text-gray-900 mt-1">
-                <?= $model->start_date ?>
+                <?= $thaiDate($model->start_date) ?>
             </dd>
         </div>
         <div>
             <dt class="text-sm font-medium text-gray-500">วันสิ้นสุดสัญญา</dt>
             <dd class="text-sm text-gray-900 mt-1">
-                <?= $model->contract_end_date ?>
+                <?= $thaiDate($model->contract_end_date) ?>
             </dd>
         </div>
     </dl>
@@ -189,7 +196,7 @@ $isExpired = $model->license_expire_date ? _isDatePast($model->license_expire_da
                     class="block text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1">วันหมดอายุ</span>
                 <span
                     class="text-sm font-bold <?= $isExpired ? 'text-red-500' : 'text-gray-900' ?>">
-                    <?= $model->license_expire_date ?: '-' ?>
+                    <?= $thaiDate($model->license_expire_date) ?>
                     <?php if ($isExpired): ?>
                         <span class="ml-2 text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded">EXPIRED</span>
                     <?php endif; ?>
