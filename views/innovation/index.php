@@ -88,7 +88,7 @@ $this->title = 'นวัตกรรม';
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <?= $model->invention_date ? date('d/m/Y', strtotime($model->invention_date)) : '-' ?>
+                            <?= $model->invention_date ? (function($d){ try { return (new \DateTime($d))->format('d/m/Y'); } catch(\Exception $e) { return '-'; } })($model->invention_date) : '-' ?>
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-500">
                             <?= Html::encode($model->advisor) ?>

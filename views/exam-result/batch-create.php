@@ -92,9 +92,9 @@ $statusList = \app\models\ExamResult::getStatusList();
                             <?php
                             $subjectLabels = \app\models\ExamResult::getSubjectLabels();
                             for ($i = 1; $i <= 8; $i++): ?>
-                                <th class="px-2 py-2 text-center text-xs font-semibold text-gray-500 uppercase min-w-[80px]"
+                                <th class="px-2 py-2 text-center text-xs font-semibold text-gray-500 uppercase whitespace-nowrap min-w-[80px]"
                                     title="<?= Html::encode($subjectLabels["subject_{$i}"]) ?>">
-                                    ว.<?= $i ?>
+                                    <?= Html::encode($subjectLabels["subject_{$i}"]) ?>
                                 </th>
                             <?php endfor; ?>
                             <th

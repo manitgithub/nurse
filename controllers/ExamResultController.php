@@ -20,7 +20,7 @@ class ExamResultController extends Controller
             'access' => [
                 'class' => AccessControl::class,
                 'rules' => [
-                    ['allow' => true, 'actions' => ['index', 'view'], 'roles' => ['@']],
+                    ['allow' => true, 'actions' => ['index', 'view', 'statistics'], 'roles' => ['@']],
                     ['allow' => true, 'actions' => ['create', 'update', 'delete', 'batch-create', 'get-students'], 'roles' => ['@']],
                 ],
             ],
@@ -149,7 +149,7 @@ class ExamResultController extends Controller
                         continue;
 
                     // Check if result already exists
-                    $studentIdStr = (string)$studentId;
+                    $studentIdStr = (string) $studentId;
                     $model = ExamResult::findOne(['student_id' => $studentIdStr, 'round_id' => $roundId]);
                     if (!$model) {
                         $model = new ExamResult();
@@ -184,6 +184,123 @@ class ExamResultController extends Controller
         return $this->render('batch-create', [
             'years' => $years,
             'rounds' => $rounds,
+        ]);
+    }
+
+    /**
+     * Exam statistics page – filterable by graduation year
+     */
+    public function actionStatistics($graduation_year = null)
+    {
+        $years = Student::getGraduationYearList();
+
+        // Default to latest year
+        if ($graduation_year === null && !empty($years)) {
+            $graduation_year = array_key_first($years);
+        }
+
+        // Get student IDs for the selected graduation year
+        $studentIds = Student::find()
+            ->select('student_id')
+            ->where(['graduation_year' => $graduation_year])
+            ->column();
+
+        $totalStudents = count($studentIds);
+
+        // Get all exam rounds that have results for these students
+        $rounds = ExamRound::find()
+            ->innerJoinWith('examResults')
+            ->where(['exam_results.student_id' => $studentIds])
+            ->groupBy('exam_rounds.id')
+            ->orderBy(['exam_rounds.year' => SORT_ASC, 'exam_rounds.round_number' => SORT_ASC])
+            ->all();
+
+        $subjectLabels = ExamResult::getSubjectLabels();
+        $roundStats = [];
+        $subjectStats = [];
+
+        foreach ($rounds as $round) {
+            $results = ExamResult::find()
+                ->where(['round_id' => $round->id, 'student_id' => $studentIds])
+                ->all();
+
+            $examCount = count($results);
+            $roundPassed = 0;
+            $roundFailed = 0;
+
+            // Init subject counters for this round
+            $subjects = [];
+            for ($i = 1; $i <= 8; $i++) {
+                $key = "subject_{$i}";
+                $subjects[$key] = ['pass' => 0, 'fail' => 0, 'na' => 0];
+            }
+
+            foreach ($results as $r) {
+                if ($r->status === 'passed') {
+                    $roundPassed++;
+                } else {
+                    $roundFailed++;
+                }
+
+                for ($i = 1; $i <= 8; $i++) {
+                    $attr = "subject_{$i}_score";
+                    $key = "subject_{$i}";
+                    if ($r->$attr === 'P') {
+                        $subjects[$key]['pass']++;
+                    } elseif ($r->$attr === 'F') {
+                        $subjects[$key]['fail']++;
+                    } else {
+                        $subjects[$key]['na']++;
+                    }
+                }
+            }
+
+            $roundStats[] = [
+                'round' => $round,
+                'exam_count' => $examCount,
+                'passed' => $roundPassed,
+                'failed' => $roundFailed,
+                'pass_rate' => $examCount > 0 ? round(($roundPassed / $examCount) * 100, 1) : 0,
+                'subjects' => $subjects,
+            ];
+        }
+
+        // Aggregate subject stats across all rounds
+        for ($i = 1; $i <= 8; $i++) {
+            $key = "subject_{$i}";
+            $totalPass = 0;
+            $totalFail = 0;
+            $totalTaken = 0;
+            foreach ($roundStats as $rs) {
+                $totalPass += $rs['subjects'][$key]['pass'];
+                $totalFail += $rs['subjects'][$key]['fail'];
+                $totalTaken += $rs['subjects'][$key]['pass'] + $rs['subjects'][$key]['fail'];
+            }
+            $subjectStats[$key] = [
+                'label' => $subjectLabels[$key],
+                'pass' => $totalPass,
+                'fail' => $totalFail,
+                'total' => $totalTaken,
+                'pass_rate' => $totalTaken > 0 ? round(($totalPass / $totalTaken) * 100, 1) : 0,
+            ];
+        }
+
+        // Overall unique passed students
+        $overallPassed = ExamResult::find()
+            ->select('student_id')
+            ->where(['student_id' => $studentIds, 'status' => 'passed'])
+            ->distinct()
+            ->count();
+
+        return $this->render('statistics', [
+            'years' => $years,
+            'selectedYear' => $graduation_year,
+            'totalStudents' => $totalStudents,
+            'overallPassed' => (int) $overallPassed,
+            'overallPassRate' => $totalStudents > 0 ? round(($overallPassed / $totalStudents) * 100, 1) : 0,
+            'roundStats' => $roundStats,
+            'subjectStats' => $subjectStats,
+            'subjectLabels' => $subjectLabels,
         ]);
     }
 

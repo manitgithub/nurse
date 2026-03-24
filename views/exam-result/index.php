@@ -45,9 +45,9 @@ $this->title = 'ผลสอบ';
                     <?php
                     $subjectLabels = \app\models\ExamResult::getSubjectLabels();
                     for ($i = 1; $i <= 8; $i++): ?>
-                        <th class="px-2 py-3 text-center text-xs font-semibold text-gray-500 uppercase"
+                        <th class="px-2 py-3 text-center text-xs font-semibold text-gray-500 uppercase whitespace-nowrap"
                             title="<?= Html::encode($subjectLabels["subject_{$i}"]) ?>">
-                            ว.<?= $i ?>
+                            <?= Html::encode($subjectLabels["subject_{$i}"]) ?>
                         </th>
                     <?php endfor; ?>
                     <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">สถานะ</th>

@@ -66,7 +66,7 @@ if (!function_exists('_formatDateSafe')) {
                         <span class="block text-[10px] font-black uppercase text-indigo-400 tracking-widest mb-1">ว/ด/ป
                             ที่คิดค้น</span>
                         <span class="text-indigo-900 font-bold">
-                            <?= $model->invention_date ? date('j F Y', strtotime($model->invention_date)) : '-' ?>
+                            <?= $model->invention_date ? (function($d){ try { return (new \DateTime($d))->format('j F Y'); } catch(\Exception $e) { return '-'; } })($model->invention_date) : '-' ?>
                         </span>
                     </div>
                     <div class="bg-amber-50 p-4 rounded-2xl">

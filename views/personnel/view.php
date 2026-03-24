@@ -5,9 +5,13 @@ $genderLabels = \app\models\Personnel::getGenderList();
 
 $thaiDate = function($date) {
     if (empty($date) || $date == '0000-00-00') return '-';
-    $t = strtotime($date);
-    $thai_months = ["", "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
-    return date('j', $t) . ' ' . $thai_months[date('n', $t)] . ' ' . (date('Y', $t) + 543);
+    try {
+        $dt = new \DateTime($date);
+        $thai_months = ["", "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+        return $dt->format('j') . ' ' . $thai_months[(int)$dt->format('n')] . ' ' . ((int)$dt->format('Y') + 543);
+    } catch (\Exception $e) {
+        return '-';
+    }
 };
 ?>
 <?php

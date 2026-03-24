@@ -5,10 +5,14 @@ use yii\helpers\Url;
 $this->title = 'รายละเอียดการเบิกจ่าย: ' . $allocation->category->name;
 
 $thaiDate = function($date) {
-    if (!$date) return '-';
-    $t = strtotime($date);
-    $thai_months = ["", "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค. "];
-    return date('j', $t) . ' ' . $thai_months[date('n', $t)] . ' ' . (date('Y', $t) + 543);
+    if (empty($date) || $date == '0000-00-00') return '-';
+    try {
+        $dt = new \DateTime($date);
+        $thai_months = ["", "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+        return $dt->format('j') . ' ' . $thai_months[(int)$dt->format('n')] . ' ' . ((int)$dt->format('Y') + 543);
+    } catch (\Exception $e) {
+        return '-';
+    }
 };
 ?>
 

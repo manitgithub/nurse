@@ -75,6 +75,8 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">รอบสอบ</a>
                                         <a href="<?= \yii\helpers\Url::to(['/exam-result/index']) ?>"
                                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">ผลสอบ</a>
+                                        <a href="<?= \yii\helpers\Url::to(['/exam-result/statistics']) ?>"
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">📊 สถิติการสอบ</a>
                                     </div>
                                 </div>
 
