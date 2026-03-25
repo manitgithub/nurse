@@ -23,7 +23,7 @@ class Personnel extends ActiveRecord
             [['resignation_year'], 'string', 'max' => 4],
             [['fullname'], 'string', 'max' => 255],
             [['academic_position', 'job_position'], 'string', 'max' => 100],
-            [['start_date', 'contract_end_date', 'birth_date'], 'safe'],
+            [['start_date', 'contract_end_date', 'birth_date', 'retirement_date'], 'safe'],
             [['photo', 'license_file', 'member_card_file'], 'string', 'max' => 500],
             [['phone'], 'string', 'max' => 20],
             [['license_no', 'council_member_no'], 'string', 'max' => 100],
@@ -66,6 +66,7 @@ class Personnel extends ActiveRecord
             'department_id' => 'สาขา',
             'subject_group_id' => 'สาขาตามโครงสร้าง',
             'resignation_year' => 'ปีที่ลาออก',
+            'retirement_date' => 'วันเกษียณอายุ',
         ];
     }
 

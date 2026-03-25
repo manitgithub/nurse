@@ -101,26 +101,33 @@ $isExpired = $model->license_expire_date ? _isDatePast($model->license_expire_da
             <dd class="text-sm text-gray-900 mt-1">
                 <?= Html::encode($model->phone) ?>
             </dd>
-        </div>
-        <div>
-            <dt class="text-sm font-medium text-gray-500">วันเกิด</dt>
-            <dd class="text-sm text-gray-900 mt-1">
-                <?= $thaiDate($model->birth_date) ?>
-            </dd>
-        </div>
-        <div>
-            <dt class="text-sm font-medium text-gray-500">วันเริ่มงาน</dt>
-            <dd class="text-sm text-gray-900 mt-1">
-                <?= $thaiDate($model->start_date) ?>
-            </dd>
-        </div>
-        <div>
-            <dt class="text-sm font-medium text-gray-500">วันสิ้นสุดสัญญา</dt>
-            <dd class="text-sm text-gray-900 mt-1">
-                <?= $thaiDate($model->contract_end_date) ?>
-            </dd>
-        </div>
     </dl>
+
+    <div class="space-y-4 mt-8 pt-6 border-t border-gray-100">
+        <div class="grid grid-cols-2 gap-4">
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                <dt class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">วันเกิด</dt>
+                <dd class="text-sm font-bold text-gray-900"><?= $thaiDate($model->birth_date) ?></dd>
+            </div>
+            <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 shadow-sm transition hover:shadow-md">
+                <dt class="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1">วันเกษียณอายุ</dt>
+                <dd class="text-sm font-bold text-indigo-700">
+                    <?= $model->retirement_date ? $thaiDate($model->retirement_date) : '<span class="text-indigo-300 italic font-normal">ไม่ระบุ</span>' ?>
+                </dd>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                <dt class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">วันเริ่มงาน</dt>
+                <dd class="text-sm font-bold text-gray-900"><?= $thaiDate($model->start_date) ?></dd>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                <dt class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">วันสิ้นสุดสัญญา</dt>
+                <dd class="text-sm font-bold text-gray-900"><?= $thaiDate($model->contract_end_date) ?></dd>
+            </div>
+        </div>
+    </div>
 
     <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4 mt-8 pt-6 border-t border-gray-100">
         <div>

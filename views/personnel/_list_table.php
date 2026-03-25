@@ -9,6 +9,7 @@ use yii\helpers\Html;
                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">ตำแหน่งงาน</th>
                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">ชื่อ-นามสกุล</th>
                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">สาขา / กลุ่มวิชา</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">วันเกษียณ / เหลือวัน</th>
                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">ประเภทสัญญา</th>
                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">สถานะ</th>
                 <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">จัดการ</th>
@@ -30,6 +31,35 @@ use yii\helpers\Html;
                         <?= Html::encode($model->department->name ?? '-') ?>
                         <br>
                         <span class="text-xs text-indigo-500"><?= Html::encode($model->subjectGroup->name ?? '') ?></span>
+                    </td>
+                    <td class="px-6 py-4 text-xs">
+                        <?php if ($model->retirement_date): ?>
+                            <?php
+                            $today = new DateTime();
+                            $retirement = new DateTime($model->retirement_date);
+                            $interval = $today->diff($retirement);
+                            $daysLeft = (int)$interval->format('%r%a');
+                            $thai_months = ["", "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+                            $yBE = (int)$retirement->format('Y') + 543;
+                            $dateStr = $retirement->format('j') . ' ' . $thai_months[(int)$retirement->format('n')] . ' ' . $yBE;
+                            ?>
+                            <div class="font-bold text-gray-900"><?= $dateStr ?></div>
+                            <?php if ($daysLeft > 0): ?>
+                                <div class="mt-1">
+                                    <span class="px-2 py-0.5 rounded-full <?= $daysLeft < 365 ? 'bg-amber-100 text-amber-700 font-bold' : 'bg-gray-100 text-gray-600' ?>">
+                                        เหลือ <?= number_format($daysLeft) ?> วัน
+                                    </span>
+                                </div>
+                            <?php elseif ($daysLeft <= 0): ?>
+                                <div class="mt-1">
+                                    <span class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 font-bold uppercase">
+                                        เกษียณแล้ว
+                                    </span>
+                                </div>
+                            <?php endif; ?>
+                        <?php else: ?>
+                            <span class="text-gray-400 italic">ไม่ระบุ</span>
+                        <?php endif; ?>
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-500">
                         <?= Html::encode($model->contractType->name ?? '-') ?>

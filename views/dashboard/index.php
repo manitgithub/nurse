@@ -514,7 +514,31 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-4">🎓 ตำแหน่งทางวิชาการ</h3>
                     <?php if (!empty($personnelByAcademicPosition)): ?>
-                        <canvas id="academicPosChart" height="200"></canvas>
+                        <div class="flex items-center">
+                            <div class="w-1/2">
+                                <canvas id="academicPosChart"></canvas>
+                            </div>
+                            <div class="w-1/2 pl-4 space-y-2" id="academicPosLegend">
+                                <?php
+                                $totalPos = array_sum(array_column($personnelByAcademicPosition, 'total'));
+                                $posColors = ['#ec4899', '#f43f5e', '#f472b6', '#fb7185', '#fda4af', '#fecdd3'];
+                                foreach ($personnelByAcademicPosition as $i => $row):
+                                    $color = $posColors[$i % count($posColors)];
+                                    $pct = $totalPos > 0 ? round(($row['total'] / $totalPos) * 100, 1) : 0;
+                                    ?>
+                                    <div class="flex items-center justify-between text-sm">
+                                        <span class="flex items-center">
+                                            <span class="w-3 h-3 rounded-full mr-2 flex-shrink-0" style="background:<?= $color ?>"></span>
+                                            <span class="text-gray-700 truncate"><?= Html::encode($row['label'] ?: 'ไม่ระบุ') ?></span>
+                                        </span>
+                                        <div class="text-right">
+                                            <span class="font-semibold text-gray-900"><?= $row['total'] ?></span>
+                                            <span class="text-xs text-gray-400 ml-1">(<?= $pct ?>%)</span>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
                     <?php else: ?>
                         <p class="text-gray-400 text-sm text-center py-8">ยังไม่มีข้อมูล</p>
                     <?php endif; ?>
@@ -946,7 +970,10 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
                                         <div class="flex justify-between text-sm mb-1">
                                             <span
                                                 class="text-gray-700 font-medium"><?= Html::encode($row['label'] ?: 'ไม่ระบุ') ?></span>
-                                            <span class="text-gray-900 font-bold"><?= $row['total'] ?> คน</span>
+                                            <div class="text-right">
+                                                <span class="text-gray-900 font-bold"><?= $row['total'] ?> คน</span>
+                                                <span class="text-xs text-amber-600 ml-1">(<?= $totalScholarships > 0 ? round($row['total'] / $totalScholarships * 100, 1) : 0 ?>%)</span>
+                                            </div>
                                         </div>
                                         <div class="w-full bg-gray-100 rounded-full h-3">
                                             <div class="<?= $barColor ?> h-3 rounded-full transition-all duration-500"
@@ -986,7 +1013,10 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
                                         <div class="flex justify-between text-sm mb-1">
                                             <span
                                                 class="text-gray-700 font-medium"><?= Html::encode($row['label'] ?: 'ไม่ระบุ') ?></span>
-                                            <span class="text-gray-900 font-bold"><?= $row['total'] ?> คน</span>
+                                            <div class="text-right">
+                                                <span class="text-gray-900 font-bold"><?= $row['total'] ?> คน</span>
+                                                <span class="text-xs text-indigo-600 ml-1">(<?= $totalScholarships > 0 ? round($row['total'] / $totalScholarships * 100, 1) : 0 ?>%)</span>
+                                            </div>
                                         </div>
                                         <div class="w-full bg-gray-100 rounded-full h-3">
                                             <div class="<?= $barColor ?> h-3 rounded-full transition-all duration-500"
@@ -1016,7 +1046,10 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
                                         <div class="flex justify-between text-sm mb-1">
                                             <span
                                                 class="text-gray-700 font-medium"><?= Html::encode($row['label'] ?: 'ไม่ระบุ') ?></span>
-                                            <span class="text-gray-900 font-bold"><?= $row['total'] ?> คน</span>
+                                            <div class="text-right">
+                                                <span class="text-gray-900 font-bold"><?= $row['total'] ?> คน</span>
+                                                <span class="text-xs text-emerald-600 ml-1">(<?= $totalScholarships > 0 ? round($row['total'] / $totalScholarships * 100, 1) : 0 ?>%)</span>
+                                            </div>
                                         </div>
                                         <div class="w-full bg-gray-100 rounded-full h-3">
                                             <div class="<?= $barColor ?> h-3 rounded-full transition-all duration-500"
@@ -1172,7 +1205,24 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
                         borderWidth: 0, hoverOffset: 8,
                     }]
                 },
-                options: { cutout: '65%', plugins: { legend: { display: false } }, responsive: true }
+                options: { 
+                    cutout: '65%', 
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    let value = context.parsed || 0;
+                                    let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    let percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                    return label + ': ' + value + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    }, 
+                    responsive: true 
+                }
             });
 
             // GPAX Line
@@ -1192,7 +1242,18 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: { y: { min: 0, max: 4, ticks: { stepSize: 0.5 } } },
-                    plugins: { legend: { display: false } }
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let val = context.parsed.y;
+                                    let pct = ((val / 4.0) * 100).toFixed(1);
+                                    return 'GPAX: ' + val.toFixed(2) + ' (' + pct + '% of 4.0)';
+                                }
+                            }
+                        }
+                    }
                 }
             });
 
@@ -1213,7 +1274,20 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
                     cutout: '70%',
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } }
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    let value = context.parsed || 0;
+                                    let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    let percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                    return label + ': ' + value + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    }
                 }
             });
 
@@ -1240,7 +1314,9 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
                         tooltip: {
                             callbacks: {
                                 label: function (context) {
-                                    return 'GPAX: ' + context.parsed.y.toFixed(2);
+                                    let val = context.parsed.y;
+                                    let pct = ((val / 4.0) * 100).toFixed(1);
+                                    return 'GPAX: ' + val.toFixed(2) + ' (' + pct + '% of 4.0)';
                                 }
                             }
                         }
@@ -1354,7 +1430,24 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
                         labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $personnelByDept)) ?>,
                         datasets: [{ label: 'จำนวน', data: <?= Json::encode(array_map(fn($r) => (int) $r['total'], $personnelByDept)) ?>, backgroundColor: chartColors, borderRadius: 8, borderSkipped: false }]
                     },
-                    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+                    options: { 
+                        responsive: true, 
+                        plugins: { 
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        let value = context.parsed.y || 0;
+                                        let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        let percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                        return label + ': ' + value + ' (' + percentage + '%)';
+                                    }
+                                }
+                            }
+                        }, 
+                        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } 
+                    }
                 });
             <?php endif; ?>
 
@@ -1365,7 +1458,25 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
                         labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $personnelByContract)) ?>,
                         datasets: [{ label: 'จำนวน', data: <?= Json::encode(array_map(fn($r) => (int) $r['total'], $personnelByContract)) ?>, backgroundColor: ['#6366f1', '#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe'], borderRadius: 8, borderSkipped: false }]
                     },
-                    options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+                    options: { 
+                        indexAxis: 'y', 
+                        responsive: true, 
+                        plugins: { 
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        let value = context.parsed.x || 0;
+                                        let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        let percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                        return label + ': ' + value + ' (' + percentage + '%)';
+                                    }
+                                }
+                            }
+                        }, 
+                        scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } } 
+                    }
                 });
             <?php endif; ?>
 
@@ -1376,7 +1487,24 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
                         labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $personnelByQualification)) ?>,
                         datasets: [{ data: <?= Json::encode(array_map(fn($r) => (int) $r['total'], $personnelByQualification)) ?>, backgroundColor: ['#6366f1', '#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe', '#ede9fe'], borderWidth: 0, hoverOffset: 6 }]
                     },
-                    options: { cutout: '60%', plugins: { legend: { display: false } }, responsive: true }
+                    options: { 
+                        cutout: '60%', 
+                        plugins: { 
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.label || '';
+                                        let value = context.parsed || 0;
+                                        let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        let percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                        return label + ': ' + value + ' (' + percentage + '%)';
+                                    }
+                                }
+                            }
+                        }, 
+                        responsive: true 
+                    }
                 });
             <?php endif; ?>
 
@@ -1387,7 +1515,24 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
                         labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $certByLevel)) ?>,
                         datasets: [{ label: 'จำนวน', data: <?= Json::encode(array_map(fn($r) => (int) $r['total'], $certByLevel)) ?>, backgroundColor: ['#f59e0b', '#f97316', '#ef4444', '#ec4899', '#8b5cf6'], borderRadius: 8, borderSkipped: false }]
                     },
-                    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+                    options: { 
+                        responsive: true, 
+                        plugins: { 
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        let value = context.parsed.y || 0;
+                                        let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        let percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                        return label + ': ' + value + ' (' + percentage + '%)';
+                                    }
+                                }
+                            }
+                        }, 
+                        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } 
+                    }
                 });
             <?php endif; ?>
 
@@ -1398,7 +1543,25 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
                         labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $topExpertises)) ?>,
                         datasets: [{ label: 'จำนวนบุคลากร', data: <?= Json::encode(array_map(fn($r) => (int) $r['total'], $topExpertises)) ?>, backgroundColor: chartColors, borderRadius: 8, borderSkipped: false }]
                     },
-                    options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+                    options: { 
+                        indexAxis: 'y', 
+                        responsive: true, 
+                        plugins: { 
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        let value = context.parsed.x || 0;
+                                        let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        let percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                        return label + ': ' + value + ' (' + percentage + '%)';
+                                    }
+                                }
+                            }
+                        }, 
+                        scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } } 
+                    }
                 });
             <?php endif; ?>
 
@@ -1409,18 +1572,57 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
                         labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $personnelByTrack)) ?>,
                         datasets: [{ data: <?= Json::encode(array_map(fn($r) => (int) $r['total'], $personnelByTrack)) ?>, backgroundColor: ['#f59e0b', '#3b82f6'], borderWidth: 0, hoverOffset: 6 }]
                     },
-                    options: { cutout: '60%', plugins: { legend: { display: false } }, responsive: true }
+                    options: { 
+                        cutout: '60%', 
+                        plugins: { 
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.label || '';
+                                        let value = context.parsed || 0;
+                                        let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        let percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                        return label + ': ' + value + ' (' + percentage + '%)';
+                                    }
+                                }
+                            }
+                        }, 
+                        responsive: true 
+                    }
                 });
             <?php endif; ?>
 
             <?php if (!empty($personnelByAcademicPosition)): ?>
                 window.academicPosChart = new Chart(document.getElementById('academicPosChart'), {
-                    type: 'bar',
+                    type: 'doughnut',
                     data: {
                         labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $personnelByAcademicPosition)) ?>,
-                        datasets: [{ label: 'จำนวนบุคลากร', data: <?= Json::encode(array_map(fn($r) => (int) $r['total'], $personnelByAcademicPosition)) ?>, backgroundColor: ['#ec4899', '#f43f5e', '#f472b6', '#fb7185'], borderRadius: 8, borderSkipped: false }]
+                        datasets: [{ 
+                            data: <?= Json::encode(array_map(fn($r) => (int) $r['total'], $personnelByAcademicPosition)) ?>, 
+                            backgroundColor: ['#ec4899', '#f43f5e', '#f472b6', '#fb7185', '#fda4af', '#fecdd3'], 
+                            borderWidth: 0, 
+                            hoverOffset: 6 
+                        }]
                     },
-                    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+                    options: { 
+                        cutout: '60%', 
+                        responsive: true, 
+                        plugins: { 
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.label || '';
+                                        let value = context.parsed || 0;
+                                        let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        let percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                        return label + ': ' + value + ' (' + percentage + '%)';
+                                    }
+                                }
+                            }
+                        } 
+                    }
                 });
             <?php endif; ?>
 
@@ -1431,7 +1633,25 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
                         labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $personnelByJobPosition)) ?>,
                         datasets: [{ label: 'จำนวนบุคลากร', data: <?= Json::encode(array_map(fn($r) => (int) $r['total'], $personnelByJobPosition)) ?>, backgroundColor: ['#10b981', '#34d399', '#059669', '#6ee7b7'], borderRadius: 8, borderSkipped: false }]
                     },
-                    options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+                    options: { 
+                        indexAxis: 'y', 
+                        responsive: true, 
+                        plugins: { 
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        let value = context.parsed.x || 0;
+                                        let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        let percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                        return label + ': ' + value + ' (' + percentage + '%)';
+                                    }
+                                }
+                            }
+                        }, 
+                        scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } } 
+                    }
                 });
             <?php endif; ?>
 
@@ -1471,9 +1691,36 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
 
                 // 5. Academic Position Chart
                 if (window.academicPosChart) {
-                    window.academicPosChart.data.labels = data.academicPosition.map(r => r.label || 'ไม่ระบุ');
-                    window.academicPosChart.data.datasets[0].data = data.academicPosition.map(r => parseInt(r.total));
+                    const labels = data.academicPosition.map(r => r.label || 'ไม่ระบุ');
+                    const values = data.academicPosition.map(r => parseInt(r.total));
+                    const total = values.reduce((a, b) => a + b, 0);
+                    
+                    window.academicPosChart.data.labels = labels;
+                    window.academicPosChart.data.datasets[0].data = values;
                     window.academicPosChart.update();
+
+                    // Update Legend
+                    const legendContainer = document.getElementById('academicPosLegend');
+                    if (legendContainer) {
+                        const colors = ['#ec4899', '#f43f5e', '#f472b6', '#fb7185', '#fda4af', '#fecdd3'];
+                        let html = '';
+                        data.academicPosition.forEach((row, i) => {
+                            const color = colors[i % colors.length];
+                            const pct = total > 0 ? ((row.total / total) * 100).toFixed(1) : 0;
+                            html += `
+                                <div class="flex items-center justify-between text-sm">
+                                    <span class="flex items-center">
+                                        <span class="w-3 h-3 rounded-full mr-2 flex-shrink-0" style="background:${color}"></span>
+                                        <span class="text-gray-700 truncate">${row.label || 'ไม่ระบุ'}</span>
+                                    </span>
+                                    <div class="text-right">
+                                        <span class="font-semibold text-gray-900">${row.total}</span>
+                                        <span class="text-xs text-gray-400 ml-1">(${pct}%)</span>
+                                    </div>
+                                </div>`;
+                        });
+                        legendContainer.innerHTML = html;
+                    }
                 }
 
                 // 6. Job Position Chart
@@ -1504,7 +1751,24 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
                             borderWidth: 0, hoverOffset: 6,
                         }]
                     },
-                    options: { cutout: '60%', plugins: { legend: { display: false } }, responsive: true }
+                    options: { 
+                        cutout: '60%', 
+                        plugins: { 
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.label || '';
+                                        let value = context.parsed || 0;
+                                        let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        let percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                        return label + ': ' + value + ' (' + percentage + '%)';
+                                    }
+                                }
+                            }
+                        }, 
+                        responsive: true 
+                    }
                 });
             <?php endif; ?>
 
@@ -1519,7 +1783,24 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
                             borderWidth: 0, hoverOffset: 6,
                         }]
                     },
-                    options: { cutout: '60%', plugins: { legend: { display: false } }, responsive: true }
+                    options: { 
+                        cutout: '60%', 
+                        plugins: { 
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.label || '';
+                                        let value = context.parsed || 0;
+                                        let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        let percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                        return label + ': ' + value + ' (' + percentage + '%)';
+                                    }
+                                }
+                            }
+                        }, 
+                        responsive: true 
+                    }
                 });
             <?php endif; ?>
 
@@ -1540,7 +1821,20 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
+                        plugins: { 
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        let value = context.parsed.y || 0;
+                                        let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        let percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                        return label + ': ' + value + ' (' + percentage + '%)';
+                                    }
+                                }
+                            }
+                        },
                         scales: {
                             y: { beginAtZero: true, ticks: { precision: 0 } },
                             x: { grid: { display: false } }
@@ -1592,7 +1886,24 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
                         labels: <?= Json::encode(array_map(fn($r) => $r['label'] ?: 'ไม่ระบุ', $researchByFunding)) ?>,
                         datasets: [{ label: 'จำนวนโครงการ', data: <?= Json::encode(array_map(fn($r) => (int) $r['total'], $researchByFunding)) ?>, backgroundColor: '#6366f1', borderRadius: 8 }]
                     },
-                    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+                    options: { 
+                        responsive: true, 
+                        plugins: { 
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        let value = context.parsed.y || 0;
+                                        let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        let percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                        return label + ': ' + value + ' (' + percentage + '%)';
+                                    }
+                                }
+                            }
+                        }, 
+                        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } 
+                    }
                 });
             <?php endif; ?>
 
@@ -1613,7 +1924,20 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
+                        plugins: { 
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        let value = context.parsed.y || 0;
+                                        let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        let percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                        return label + ': ' + value + ' (' + percentage + '%)';
+                                    }
+                                }
+                            }
+                        },
                         scales: {
                             y: { beginAtZero: true, ticks: { precision: 0 } },
                             x: { grid: { display: false } }
@@ -1675,7 +1999,20 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
+                        plugins: { 
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        let value = context.parsed.y || 0;
+                                        let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        let percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                        return label + ': ' + value + ' (' + percentage + '%)';
+                                    }
+                                }
+                            }
+                        },
                         scales: {
                             y: { beginAtZero: true, ticks: { precision: 0 } },
                             x: { grid: { display: false } }
@@ -1701,7 +2038,20 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
                         indexAxis: 'y', // Horizontal bars
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
+                        plugins: { 
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        let value = context.parsed.x || 0;
+                                        let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        let percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                        return label + ': ' + value + ' (' + percentage + '%)';
+                                    }
+                                }
+                            }
+                        },
                         scales: {
                             x: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } },
                             y: { grid: { display: false } }
@@ -1731,7 +2081,10 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
                             tooltip: {
                                 callbacks: {
                                     label: function (context) {
-                                        return 'จำนวน: ' + context.parsed.y + ' คน';
+                                        let val = context.parsed.y;
+                                        let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        let pct = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
+                                        return 'จำนวน: ' + val + ' คน (' + pct + '%)';
                                     }
                                 }
                             }
@@ -1771,7 +2124,10 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
                             tooltip: {
                                 callbacks: {
                                     label: function (context) {
-                                        return 'จำนวน: ' + context.parsed.y + ' คน';
+                                        let val = context.parsed.y;
+                                        let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        let pct = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
+                                        return 'จำนวน: ' + val + ' คน (' + pct + '%)';
                                     }
                                 }
                             }
@@ -1871,7 +2227,16 @@ $this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [
                             tooltip: {
                                 callbacks: {
                                     label: function(context) {
-                                        return context.dataset.label + ': ' + context.parsed.y.toLocaleString() + ' บาท';
+                                        let val = context.parsed.y;
+                                        let otherVal = context.datasetIndex === 0 ? context.chart.data.datasets[1].data[context.dataIndex] : context.chart.data.datasets[0].data[context.dataIndex];
+                                        let label = context.dataset.label + ': ' + val.toLocaleString() + ' บาท';
+                                        
+                                        if (context.datasetIndex === 1) { // เบิกจ่ายจริง
+                                            let budget = context.chart.data.datasets[0].data[context.dataIndex];
+                                            let pct = budget > 0 ? ((val / budget) * 100).toFixed(2) : 0;
+                                            label += ' (' + pct + '% ของงบประมาณ)';
+                                        }
+                                        return label;
                                     }
                                 }
                             }

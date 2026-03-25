@@ -48,10 +48,14 @@ $inputClass = 'w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-5
     </div>
 
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">วันเกิด</label>
             <?= $form->field($model, 'birth_date')->textInput(['class' => $inputClass . ' datepicker-be'])->label(false) ?>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">วันเกษียณอายุ</label>
+            <?= $form->field($model, 'retirement_date')->textInput(['class' => $inputClass . ' datepicker-be'])->label(false) ?>
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">วันเริ่มงาน</label>

@@ -4,6 +4,7 @@ namespace app\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\db\Expression;
 use app\models\Personnel;
 
 /**
@@ -20,7 +21,7 @@ class PersonnelSearch extends Personnel
     public function rules()
     {
         return [
-            [['personnel_code', 'fullname', 'track', 'department_id', 'subject_group_id', 'status', 'job_position', 'gender', 'academic_position', 'qualification_id', 'contract_type_id', 'resignation_year', 'expertise_id', 'active_year_be'], 'safe'],
+            [['personnel_code', 'fullname', 'track', 'department_id', 'subject_group_id', 'status', 'job_position', 'gender', 'academic_position', 'qualification_id', 'contract_type_id', 'resignation_year', 'expertise_id', 'active_year_be', 'retirement_date'], 'safe'],
         ];
     }
 
@@ -48,7 +49,16 @@ class PersonnelSearch extends Personnel
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
+            'sort' => [
+                'defaultOrder' => ['retirement_date' => SORT_ASC],
+                'attributes' => array_merge($this->attributes(), [
+                    'retirement_date' => [
+                        'asc' => [new \yii\db\Expression('retirement_date IS NULL ASC, retirement_date ASC')],
+                        'desc' => [new \yii\db\Expression('retirement_date IS NULL ASC, retirement_date DESC')],
+                        'label' => 'วันเกษียณอายุ'
+                    ]
+                ])
+            ],
             'pagination' => ['pageSize' => 20],
         ]);
 
@@ -76,7 +86,8 @@ class PersonnelSearch extends Personnel
             ->andFilterWhere(['academic_position' => $this->academic_position])
             ->andFilterWhere(['qualification_id' => $this->qualification_id])
             ->andFilterWhere(['contract_type_id' => $this->contract_type_id])
-            ->andFilterWhere(['resignation_year' => $this->resignation_year]);
+            ->andFilterWhere(['resignation_year' => $this->resignation_year])
+            ->andFilterWhere(['retirement_date' => $this->retirement_date]);
 
         if ($this->expertise_id) {
             $query->joinWith('expertises')
