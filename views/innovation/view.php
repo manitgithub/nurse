@@ -1,5 +1,4 @@
 <?php
-
 use yii\helpers\Html;
 use yii\helpers\Url;
 
@@ -8,43 +7,37 @@ use yii\helpers\Url;
 
 $this->title = $model->name;
 ?>
-<?php
-if (!function_exists('_formatDateSafe')) {
-    function _formatDateSafe($dateStr)
-    {
-        if (empty($dateStr)) return '-';
-        $s = trim((string)$dateStr);
-        $d = $mo = $y = null;
-        if (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $s, $m)) {
-            $y = (int)$m[1]; $mo = (int)$m[2]; $d = (int)$m[3];
-        } elseif (preg_match('/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/', $s, $m)) {
-            $d = (int)$m[1]; $mo = (int)$m[2]; $y = (int)$m[3];
-        } elseif (preg_match('/(19|20|25)\d{2}/', $s, $m)) {
-            $y = (int)$m[0]; if ($y > 2400) $y -= 543; $mo = 1; $d = 1;
-        } else {
-            try {
-                $dt = new DateTime($s);
-                $y = (int)$dt->format('Y'); $mo = (int)$dt->format('n'); $d = (int)$dt->format('j');
-            } catch (Exception $e) {
-                return '-';
-            }
-        }
-        $months = [1=>'January',2=>'February',3=>'March',4=>'April',5=>'May',6=>'June',7=>'July',8=>'August',9=>'September',10=>'October',11=>'November',12=>'December'];
-        return sprintf('%d %s %d', $d, $months[$mo] ?? $mo, $y);
-    }
-}
-?>
 
-<div class="max-w-5xl mx-auto py-10 px-4">
-    <div class="flex items-center justify-between mb-8">
-        <div class="flex items-center space-x-4">
-            <?= Html::a('←', ['index'], ['class' => 'text-gray-400 hover:text-gray-600 text-2xl transition-colors']) ?>
-            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">รายละเอียดนวัตกรรม</h1>
+<!-- Google Fonts Link for premium typography -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+    .font-premium {
+        font-family: 'Inter', 'Sarabun', 'Kanit', sans-serif;
+    }
+</style>
+
+<div class="font-premium space-y-6">
+    <!-- Top Action Bar -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-100">
+        <div class="flex items-center space-x-3">
+            <div class="p-2.5 bg-purple-50 text-purple-600 rounded-xl">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3z" />
+                </svg>
+            </div>
+            <div>
+                <span class="text-xs font-semibold uppercase tracking-wider text-purple-600 bg-purple-50 px-2.5 py-1 rounded-md">นวัตกรรมและสิ่งประดิษฐ์</span>
+                <h1 class="text-xl font-bold text-gray-900 mt-1">รายละเอียดนวัตกรรม</h1>
+            </div>
         </div>
-        <div class="space-x-3">
-            <?= Html::a('แก้ไข', ['update', 'id' => $model->id], ['class' => 'bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg transition-all']) ?>
-            <?= Html::a('ลบ', ['delete', 'id' => $model->id], [
-                'class' => 'bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg transition-all',
+        <div class="flex items-center space-x-3">
+            <?= Html::a('← ย้อนกลับ', ['index'], ['class' => 'px-4 py-2 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition shadow-sm flex items-center']) ?>
+            <?= Html::a('✏️ แก้ไขข้อมูล', ['update', 'id' => $model->id], ['class' => 'px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl text-sm font-semibold transition shadow-md hover:shadow-lg flex items-center']) ?>
+            <?= Html::a('🗑️ ลบข้อมูล', ['delete', 'id' => $model->id], [
+                'class' => 'px-4 py-2 border border-red-200 text-red-600 hover:bg-red-50 rounded-xl text-sm font-medium transition shadow-sm flex items-center',
                 'data' => [
                     'confirm' => 'คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนี้?',
                     'method' => 'post',
@@ -53,135 +46,212 @@ if (!function_exists('_formatDateSafe')) {
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Main Content -->
-        <div class="lg:col-span-2 space-y-8">
-            <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
-                <h2 class="text-2xl font-black text-gray-900 mb-6">
-                    <?= Html::encode($model->name) ?>
-                </h2>
+    <!-- Hero Header Panel -->
+    <div class="relative overflow-hidden bg-gradient-to-r from-purple-900 via-slate-900 to-indigo-950 text-white rounded-2xl shadow-xl p-8 md:p-10">
+        <!-- Background decorative glows -->
+        <div class="absolute -right-10 -top-10 w-40 h-40 bg-pink-500 rounded-full blur-3xl opacity-30"></div>
+        <div class="absolute right-1/4 bottom-0 w-60 h-20 bg-purple-500 rounded-full blur-3xl opacity-20"></div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 text-sm">
-                    <div class="bg-indigo-50 p-4 rounded-2xl">
-                        <span class="block text-[10px] font-black uppercase text-indigo-400 tracking-widest mb-1">ว/ด/ป
-                            ที่คิดค้น</span>
-                        <span class="text-indigo-900 font-bold">
-                            <?= $model->invention_date ? (function($d){ try { return (new \DateTime($d))->format('j F Y'); } catch(\Exception $e) { return '-'; } })($model->invention_date) : '-' ?>
-                        </span>
-                    </div>
-                    <div class="bg-amber-50 p-4 rounded-2xl">
-                        <span
-                            class="block text-[10px] font-black uppercase text-amber-400 tracking-widest mb-1">อาจารย์ที่ปรึกษา</span>
-                        <span class="text-amber-900 font-bold">
-                            <?= Html::encode($model->advisor ?: '-') ?>
-                        </span>
-                    </div>
-                </div>
-
-                <div class="space-y-8">
-                    <div>
-                        <h3 class="flex items-center text-sm font-black text-gray-400 uppercase tracking-widest mb-3">
-                            <span class="bg-gray-100 w-8 h-[2px] mr-3"></span> สถานการณ์หรือปัญหา
-                        </h3>
-                        <div class="text-gray-700 leading-relaxed whitespace-pre-line pl-11 border-l-2 border-gray-50">
-                            <?= Html::encode($model->problem) ?>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h3 class="flex items-center text-sm font-black text-gray-400 uppercase tracking-widest mb-3">
-                            <span class="bg-gray-100 w-8 h-[2px] mr-3"></span> กระบวนการนวัตกรรม
-                        </h3>
-                        <div class="text-gray-700 leading-relaxed whitespace-pre-line pl-11 border-l-2 border-gray-50">
-                            <?= Html::encode($model->process) ?>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h3 class="flex items-center text-sm font-black text-gray-400 uppercase tracking-widest mb-3">
-                            <span class="bg-gray-100 w-8 h-[2px] mr-3"></span> ผลลัพธ์/การนำไปใช้
-                        </h3>
-                        <div class="text-gray-700 leading-relaxed whitespace-pre-line pl-11 border-l-2 border-gray-50">
-                            <?= Html::encode($model->results) ?>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h3 class="flex items-center text-sm font-black text-gray-400 uppercase tracking-widest mb-3">
-                            <span class="bg-gray-100 w-8 h-[2px] mr-3"></span> ผู้พัฒนานวัตกรรม
-                        </h3>
-                        <div class="text-gray-700 leading-bold pl-11 border-l-2 border-gray-50 italic">
-                            <?= Html::encode($model->developers) ?>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Photos Section -->
-            <?php if (count($model->images) > 0): ?>
-                <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
-                    <h3 class="text-lg font-black text-gray-900 mb-6 flex items-center">
-                        <span class="bg-emerald-500 w-2 h-6 mr-3 rounded"></span> รายรูปภาพผลงาน
-                    </h3>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        <?php foreach ($model->images as $file): ?>
-                            <a href="<?= Url::to('@web/' . $file->file_path) ?>" target="_blank"
-                                class="block aspect-square overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all hover:-translate-y-1">
-                                <img src="<?= Url::to('@web/' . $file->file_path) ?>" class="w-full h-full object-cover">
-                            </a>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-            <?php endif; ?>
-        </div>
-
-        <!-- Sidebar -->
-        <div class="space-y-8">
-            <!-- Location Map Card -->
-            <div class="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100">
-                <div class="p-6 border-b border-gray-50">
-                    <h3 class="text-sm font-black text-gray-400 uppercase tracking-widest">พิกัดสถานที่</h3>
-                </div>
-                <div id="map" class="h-64 w-full bg-gray-50"></div>
-                <?php if ($model->latitude && $model->longitude): ?>
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function () {
-                            var map = L.map('map').setView([<?= $model->latitude ?>, <?= $model->longitude ?>], 13);
-                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-                            L.marker([<?= $model->latitude ?>, <?= $model->longitude ?>]).addTo(map);
-                        });
-                    </script>
-                    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-                    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-                <?php else: ?>
-                    <div class="h-64 flex items-center justify-center text-gray-400 italic text-sm">ไม่ระบุพิกัด</div>
+        <div class="relative z-10 space-y-6">
+            <div class="flex flex-wrap items-center gap-2">
+                <span class="inline-flex items-center rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3 py-1 text-xs font-semibold">
+                    💡 นวัตกรรมเด่น
+                </span>
+                <?php if ($model->invention_date): ?>
+                    <span class="inline-flex items-center rounded-lg bg-white/10 text-white/90 border border-white/10 px-3 py-1 text-xs font-semibold">
+                        🗓️ วันคิดค้น: 
+                        <?= (function($d){ try { return (new \DateTime($d))->format('j F Y'); } catch(\Exception $e) { return '-'; } })($model->invention_date) ?>
+                    </span>
                 <?php endif; ?>
             </div>
 
-            <!-- Files Card -->
-            <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
-                <h3 class="text-sm font-black text-gray-400 uppercase tracking-widest mb-6">เอกสารแนบ</h3>
-                <div class="space-y-3">
-                    <?php foreach ($model->attachments as $file): ?>
-                        <a href="<?= Url::to('@web/' . $file->file_path) ?>" target="_blank"
-                            class="flex items-center p-3 bg-gray-50 hover:bg-indigo-50 rounded-2xl transition-colors group">
-                            <div
-                                class="bg-indigo-100 p-2 rounded-xl mr-3 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                            </div>
-                            <span class="text-xs font-bold text-gray-600 truncate group-hover:text-indigo-900">
-                                <?= Html::encode($file->original_name) ?>
-                            </span>
-                        </a>
-                    <?php endforeach; ?>
-                    <?php if (count($model->attachments) === 0): ?>
-                        <div class="text-center py-4 text-gray-400 text-xs italic">ไม่มีเอกสารแนบ</div>
-                    <?php endif; ?>
+            <h2 class="text-2xl md:text-3xl font-bold leading-snug tracking-tight text-white max-w-4xl">
+                <?= Html::encode($model->name) ?>
+            </h2>
+
+            <!-- Advisor and Developers list footer -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-white/10 text-sm">
+                <div class="flex items-center space-x-3">
+                    <div class="flex-shrink-0 h-9 w-9 rounded-xl bg-purple-500/25 border border-purple-500/35 flex items-center justify-center text-sm font-semibold text-purple-300">
+                        👨‍🏫
+                    </div>
+                    <div>
+                        <p class="text-white/60 text-xs font-medium">อาจารย์ที่ปรึกษา</p>
+                        <p class="font-semibold text-white/90 mt-0.5"><?= Html::encode($model->advisor ?: 'ไม่ระบุ') ?></p>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                    <div class="flex-shrink-0 h-9 w-9 rounded-xl bg-indigo-500/25 border border-indigo-500/35 flex items-center justify-center text-sm font-semibold text-indigo-300">
+                        👥
+                    </div>
+                    <div>
+                        <p class="text-white/60 text-xs font-medium">ผู้พัฒนานวัตกรรม</p>
+                        <p class="font-semibold text-white/90 mt-0.5 truncate max-w-sm" title="<?= Html::encode($model->developers) ?>">
+                            <?= Html::encode($model->developers ?: 'ไม่ระบุ') ?>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Main Two-Column Layout Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Left Side: Main Narrative sections (col-span 2) -->
+        <div class="lg:col-span-2 space-y-6">
+            
+            <!-- Card 1: Problems and Process Details -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8 space-y-8">
+                
+                <!-- Section: ปัญหาที่มา -->
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-3 pb-2 border-b border-gray-50">
+                        <span class="text-lg">🚨</span>
+                        <h3 class="text-md font-bold text-gray-800">สถานการณ์หรือปัญหาที่ก่อให้เกิดนวัตกรรม</h3>
+                    </div>
+                    <div class="bg-red-50/20 text-gray-700 rounded-xl p-5 border border-red-100/30 text-sm leading-relaxed whitespace-pre-line font-medium pl-6">
+                        <?= Html::encode($model->problem) ?: 'ไม่มีข้อมูลสถานการณ์หรือปัญหาเริ่มต้น' ?>
+                    </div>
+                </div>
+
+                <!-- Section: กระบวนการพัฒนา -->
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-3 pb-2 border-b border-gray-50">
+                        <span class="text-lg">⚙️</span>
+                        <h3 class="text-md font-bold text-gray-800">กระบวนการพัฒนาหรือทำงานของนวัตกรรม</h3>
+                    </div>
+                    <div class="bg-indigo-50/20 text-gray-700 rounded-xl p-5 border border-indigo-100/30 text-sm leading-relaxed whitespace-pre-line font-medium pl-6">
+                        <?= Html::encode($model->process) ?: 'ไม่มีข้อมูลกระบวนการพัฒนาหรือคู่มือการทำงาน' ?>
+                    </div>
+                </div>
+
+                <!-- Section: ผลลัพธ์การนำไปใช้ -->
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-3 pb-2 border-b border-gray-50">
+                        <span class="text-lg">🏆</span>
+                        <h3 class="text-md font-bold text-gray-800">ผลลัพธ์และการนำนวัตกรรมไปใช้ประโยชน์</h3>
+                    </div>
+                    <div class="bg-emerald-50/20 text-gray-700 rounded-xl p-5 border border-emerald-100/30 text-sm leading-relaxed whitespace-pre-line font-medium pl-6">
+                        <?= Html::encode($model->results) ?: 'ไม่มีข้อมูลผลการนำไปใช้ประโยชน์ในปัจจุบัน' ?>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Side: Location Map, Attachments, Images (col-span 1) -->
+        <div class="space-y-6">
+
+            <!-- Card 2: Location Map -->
+            <?php if ($model->latitude && $model->longitude): ?>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-4">
+                    <div class="flex items-center justify-between pb-3 border-b border-gray-100">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-lg">📍</span>
+                            <h3 class="text-sm font-bold text-gray-800">พิกัดสถานที่ติดตั้ง</h3>
+                        </div>
+                        <a href="https://www.google.com/maps?q=<?= $model->latitude ?>,<?= $model->longitude ?>" target="_blank"
+                            class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center">
+                            Google Maps &rarr;
+                        </a>
+                    </div>
+
+                    <!-- Map container -->
+                    <div id="map" class="w-full h-48 rounded-xl border border-gray-200 z-0"></div>
+
+                    <div class="grid grid-cols-2 gap-2 text-center bg-gray-50 py-2.5 rounded-xl border border-gray-100 text-xs">
+                        <div>
+                            <span class="text-gray-400">ละติจูด:</span>
+                            <span class="font-semibold text-gray-700 block mt-0.5"><?= $model->latitude ?></span>
+                        </div>
+                        <div class="border-l border-gray-200">
+                            <span class="text-gray-400">ลองจิจูด:</span>
+                            <span class="font-semibold text-gray-700 block mt-0.5"><?= $model->longitude ?></span>
+                        </div>
+                    </div>
+                </div>
+
+                <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+                <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        var map = L.map('map', { zoomControl: false }).setView([<?= $model->latitude ?>, <?= $model->longitude ?>], 14);
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            attribution: '&copy; OpenStreetMap contributors'
+                        }).addTo(map);
+                        
+                        L.control.zoom({ position: 'bottomright' }).addTo(map);
+                        
+                        L.marker([<?= $model->latitude ?>, <?= $model->longitude ?>]).addTo(map)
+                            .bindPopup('<b><?= addslashes(Html::encode($model->name)) ?></b>').openPopup();
+                    });
+                </script>
+            <?php else: ?>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-2 text-center">
+                    <span class="text-gray-300 text-2xl block">📍</span>
+                    <span class="text-xs text-gray-400 block">ไม่มีการระบุพิกัดในระบบ</span>
+                </div>
+            <?php endif; ?>
+
+            <!-- Card 3: Document Attachments -->
+            <?php $attachments = $model->attachments; ?>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-4">
+                <div class="flex items-center space-x-2 pb-3 border-b border-gray-100">
+                    <span class="text-lg">📎</span>
+                    <h3 class="text-sm font-bold text-gray-800">เอกสารแนบ (<?= count($attachments) ?>)</h3>
+                </div>
+
+                <?php if ($attachments): ?>
+                    <div class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                        <?php foreach ($attachments as $file): ?>
+                            <a href="<?= Url::to('@web/' . $file->file_path) ?>" target="_blank"
+                                class="flex items-center p-3 bg-gray-50 rounded-xl hover:bg-purple-50 border border-transparent hover:border-purple-100 transition duration-200 group">
+                                <div class="p-2 bg-white rounded-lg shadow-sm text-purple-500 mr-3 group-hover:bg-purple-100 group-hover:text-purple-600 transition">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                                    </svg>
+                                </div>
+                                <span class="text-xs text-purple-600 font-semibold truncate flex-1 group-hover:text-purple-700">
+                                    <?= Html::encode($file->original_name) ?>
+                                </span>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <p class="text-xs text-gray-400 text-center py-4">ไม่มีเอกสารแนบในระบบ</p>
+                <?php endif; ?>
+            </div>
+
+            <!-- Card 4: Image Gallery Preview -->
+            <?php $images = $model->images; ?>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-4">
+                <div class="flex items-center space-x-2 pb-3 border-b border-gray-100">
+                    <span class="text-lg">🖼️</span>
+                    <h3 class="text-sm font-bold text-gray-800">รูปภาพประกอบ (<?= count($images) ?>)</h3>
+                </div>
+
+                <?php if ($images): ?>
+                    <div class="grid grid-cols-2 gap-3">
+                        <?php foreach ($images as $file): ?>
+                            <a href="<?= Url::to('@web/' . $file->file_path) ?>" target="_blank" 
+                               class="group block relative overflow-hidden rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition">
+                                <img src="<?= Url::to('@web/' . $file->file_path) ?>"
+                                    alt="<?= Html::encode($file->original_name) ?>"
+                                    class="w-full h-24 object-cover transform group-hover:scale-105 transition duration-300">
+                                <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition duration-200 flex items-center justify-center">
+                                    <span class="text-xs font-semibold text-white bg-black/60 px-2 py-1 rounded">ขยายรูป</span>
+                                </div>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <p class="text-xs text-gray-400 text-center py-4">ไม่มีรูปภาพประกอบ</p>
+                <?php endif; ?>
+            </div>
+
+        </div>
+
     </div>
 </div>

@@ -220,6 +220,80 @@ class DashboardController extends Controller
             }
         }
 
+        // ดึงรายการข้อมูลเพื่อทำเป็นป๊อปอัป (Popup details lists)
+        $allStudentsList = Student::find()
+            ->select(['student_id', 'fullname', 'status', 'batch'])
+            ->asArray()
+            ->all();
+
+        $allPersonnelList = Personnel::find()
+            ->select([
+                'personnels.id', 
+                'personnels.fullname', 
+                'personnels.track', 
+                'personnels.status', 
+                'personnels.academic_position', 
+                'personnels.job_position', 
+                'personnels.personnel_code', 
+                'personnels.department_id', 
+                'd.name as department_name',
+                'personnels.contract_type_id', 
+                'c.name as contract_type_name',
+                'personnels.qualification_id',
+                'q.name as qualification_name'
+            ])
+            ->leftJoin('departments d', 'personnels.department_id = d.id')
+            ->leftJoin('contract_types c', 'personnels.contract_type_id = c.id')
+            ->leftJoin('qualifications q', 'personnels.qualification_id = q.id')
+            ->asArray()
+            ->all();
+
+        $allScholarshipsList = Scholarship::find()
+            ->select([
+                'scholarships.id', 
+                'scholarships.scholar_name', 
+                'scholarships.academic_year', 
+                'scholarships.institution', 
+                'scholarships.major',
+                'scholarships.start_date',
+                'scholarships.end_date',
+                'q.name as qualification_name'
+            ])
+            ->leftJoin('qualifications q', 'scholarships.qualification_id = q.id')
+            ->asArray()
+            ->all();
+
+        $allCertificationsList = Certification::find()
+            ->select(['certifications.id', 'p.fullname as personnel_name', 'p.id as personnel_id', 'cl.name as level_name', 'certifications.training_batch'])
+            ->innerJoin('personnels p', 'certifications.personnel_id = p.id')
+            ->leftJoin('certification_levels cl', 'certifications.certification_level_id = cl.id')
+            ->where(['p.status' => 1])
+            ->asArray()
+            ->all();
+
+        $allExpertisesList = PersonnelExpertise::find()
+            ->select(['p.fullname as personnel_name', 'p.id as personnel_id', 'e.name as expertise_name'])
+            ->innerJoin('personnels p', 'personnel_expertises.personnel_id = p.id')
+            ->leftJoin('expertises e', 'personnel_expertises.expertise_id = e.id')
+            ->where(['p.status' => 1])
+            ->asArray()
+            ->all();
+
+        $allResearchList = Research::find()
+            ->select(['id', 'title', 'work_status', 'funding_source', 'budget', 'year'])
+            ->asArray()
+            ->all();
+
+        $allAcademicServiceList = AcademicService::find()
+            ->select(['id', 'activity_name', 'status', 'budget_amount', 'fiscal_year'])
+            ->asArray()
+            ->all();
+
+        $allInnovationsList = \app\models\Innovation::find()
+            ->select(['id', 'name as title', 'advisor', 'invention_date'])
+            ->asArray()
+            ->all();
+
         // แผนอัตรากำลัง
         $latestPlan = AcademicRecruitmentPlan::find()->orderBy(['fiscal_year' => SORT_DESC])->one();
         $remainingQuota = $latestPlan ? $latestPlan->getRemainingQuota() : 0;
@@ -296,6 +370,60 @@ class DashboardController extends Controller
         $licenseTotal = ExamResult::find()->select('student_id')->distinct()->count();
         $licensePassed = ExamResult::find()->where(['status' => 'passed'])->select('student_id')->distinct()->count();
         $licenseRate = $licenseTotal > 0 ? round($licensePassed / $licenseTotal * 100, 1) : 0;
+
+        // ผลสอบใบอนุญาตแยกตามรุ่นนักศึกษา (Batch) สำหรับ drill-down สรุปผู้บริหาร
+        $licenseTotalByBatch = ExamResult::find()
+            ->select(['s.batch', 'COUNT(DISTINCT exam_results.student_id) as total'])
+            ->leftJoin('students s', 'exam_results.student_id = s.student_id')
+            ->andWhere(['not', ['s.batch' => null]])
+            ->andWhere(['!=', 's.batch', ''])
+            ->groupBy('s.batch')
+            ->asArray()
+            ->all();
+
+        $licensePassedByBatch = ExamResult::find()
+            ->select(['s.batch', 'COUNT(DISTINCT exam_results.student_id) as passed'])
+            ->leftJoin('students s', 'exam_results.student_id = s.student_id')
+            ->where(['exam_results.status' => 'passed'])
+            ->andWhere(['not', ['s.batch' => null]])
+            ->andWhere(['!=', 's.batch', ''])
+            ->groupBy('s.batch')
+            ->asArray()
+            ->all();
+
+        $licenseBatchStats = [];
+        foreach ($licenseTotalByBatch as $row) {
+            $batch = $row['batch'];
+            $licenseBatchStats[$batch] = [
+                'batch' => $batch,
+                'total' => (int)$row['total'],
+                'passed' => 0,
+                'rate' => 0.0
+            ];
+        }
+        foreach ($licensePassedByBatch as $row) {
+            $batch = $row['batch'];
+            if (isset($licenseBatchStats[$batch])) {
+                $licenseBatchStats[$batch]['passed'] = (int)$row['passed'];
+                $licenseBatchStats[$batch]['rate'] = round(($row['passed'] / $licenseBatchStats[$batch]['total']) * 100, 1);
+            }
+        }
+        ksort($licenseBatchStats);
+
+        // สัดส่วนบุคลากรสายวิชาการและสายสนับสนุนแยกตามภาควิชา (Department) สำหรับ drill-down สรุปผู้บริหาร
+        $deptPersonnelRatio = Personnel::find()
+            ->select([
+                'd.name as department_name',
+                'SUM(CASE WHEN track = \'สาย ว\' THEN 1 ELSE 0 END) as academic_count',
+                'SUM(CASE WHEN track = \'สาย ป\' THEN 1 ELSE 0 END) as operational_count',
+                'COUNT(*) as total_count'
+            ])
+            ->leftJoin('departments d', 'personnels.department_id = d.id')
+            ->where(['personnels.status' => 1]) // active เท่านั้น
+            ->groupBy('personnels.department_id')
+            ->orderBy(['total_count' => SORT_DESC])
+            ->asArray()
+            ->all();
 
         // === สถิติแยกตามข้อมูลหลัก (บุคลากรที่ปฏิบัติงานเท่านั้น) ===
         $personnelStatsByTrack = ['total' => [], 'academic' => [], 'operational' => []];
@@ -582,6 +710,70 @@ class DashboardController extends Controller
             usort($currentYearBreakdown, fn($a, $b) => $b['percent'] <=> $a['percent']);
         }
 
+        // รายปีงบประมาณและข้อมูลหมวดหมู่ย่อยสำหรับ Drill-down งบประมาณ สรุปผู้บริหาร
+        $budgetBreakdownByYear = [];
+        $allAllocations = BudgetAllocation::find()->with('category')->all();
+        foreach ($allAllocations as $alloc) {
+            $year = $alloc->fiscal_year;
+            $spent = $alloc->getTotalExpenses();
+            $total = $alloc->getTotalBudget();
+            $category = $alloc->category->name ?? 'ไม่ระบุหมวด';
+            
+            if (!isset($budgetBreakdownByYear[$year])) {
+                $budgetBreakdownByYear[$year] = [];
+            }
+            $budgetBreakdownByYear[$year][] = [
+                'category' => $category,
+                'total' => (float)$total,
+                'spent' => (float)$spent,
+                'percent' => $total > 0 ? round(($spent / $total) * 100, 1) : 0,
+                'remaining' => (float)($total - $spent)
+            ];
+        }
+        foreach ($budgetBreakdownByYear as $year => &$items) {
+            usort($items, fn($a, $b) => $b['percent'] <=> $a['percent']);
+        }
+        unset($items);
+
+        $allBudgetAllocationsList = BudgetAllocation::find()
+            ->select([
+                'budget_allocations.id',
+                'budget_allocations.fiscal_year',
+                'budget_allocations.allocated_amount',
+                'budget_allocations.adjustment_reduction',
+                'budget_allocations.adjustment_addition',
+                'c.name as category_name',
+                'COALESCE(SUM(t.cost_compensation + t.cost_accommodation + t.cost_materials + t.cost_hospitality + t.cost_transportation), 0) as total_spent'
+            ])
+            ->leftJoin('budget_categories c', 'budget_allocations.category_id = c.id')
+            ->leftJoin('budget_transactions t', 't.allocation_id = budget_allocations.id')
+            ->groupBy([
+                'budget_allocations.id',
+                'budget_allocations.fiscal_year',
+                'budget_allocations.allocated_amount',
+                'budget_allocations.adjustment_reduction',
+                'budget_allocations.adjustment_addition',
+                'c.name'
+            ])
+            ->asArray()
+            ->all();
+
+        $allBudgetTransactionsList = BudgetTransaction::find()
+            ->select([
+                'budget_transactions.id',
+                'budget_transactions.allocation_id',
+                'budget_transactions.transaction_date',
+                'budget_transactions.activity_name',
+                'budget_transactions.requester',
+                '(COALESCE(cost_compensation, 0) + COALESCE(cost_accommodation, 0) + COALESCE(cost_materials, 0) + COALESCE(cost_hospitality, 0) + COALESCE(cost_transportation, 0)) as total_cost',
+                'a.fiscal_year',
+                'c.name as category_name'
+            ])
+            ->leftJoin('budget_allocations a', 'budget_transactions.allocation_id = a.id')
+            ->leftJoin('budget_categories c', 'a.category_id = c.id')
+            ->asArray()
+            ->all();
+
         return $this->render('index', [
             'totalStudents' => $totalStudents,
             'activeStudents' => $activeStudents,
@@ -623,6 +815,7 @@ class DashboardController extends Controller
             'scholarByMajor' => $scholarByMajor,
             'scholarByInstitution' => $scholarByInstitution,
             'certByLevel' => $certByLevel,
+            'topExpertises' => $topExpertises,
             'personnelStatsByTrack' => $personnelStatsByTrack,
             // research & academic service
             'totalResearch' => $totalResearch,
@@ -648,6 +841,19 @@ class DashboardController extends Controller
             'currentYearTotalBudget' => (float)$currentYearTotalBudget,
             'currentYearTotalSpent' => (float)$currentYearTotalSpent,
             'currentYearBreakdown' => $currentYearBreakdown,
+            'allStudentsList' => $allStudentsList,
+            'allPersonnelList' => $allPersonnelList,
+            'allScholarshipsList' => $allScholarshipsList,
+            'allCertificationsList' => $allCertificationsList,
+            'allExpertisesList' => $allExpertisesList,
+            'allResearchList' => $allResearchList,
+            'allAcademicServiceList' => $allAcademicServiceList,
+            'allInnovationsList' => $allInnovationsList,
+            'allBudgetAllocationsList' => $allBudgetAllocationsList,
+            'allBudgetTransactionsList' => $allBudgetTransactionsList,
+            'licenseBatchStats' => $licenseBatchStats,
+            'deptPersonnelRatio' => $deptPersonnelRatio,
+            'budgetBreakdownByYear' => $budgetBreakdownByYear,
         ]);
     }
 }

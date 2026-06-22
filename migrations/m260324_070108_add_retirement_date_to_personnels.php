@@ -9,7 +9,7 @@ class m260324_070108_add_retirement_date_to_personnels extends Migration
      */
     public function safeUp()
     {
-
+        $this->addColumn('{{%personnels}}', 'retirement_date', $this->date());
     }
 
     /**
@@ -17,9 +17,7 @@ class m260324_070108_add_retirement_date_to_personnels extends Migration
      */
     public function safeDown()
     {
-        echo "m260324_070108_add_retirement_date_to_personnels cannot be reverted.\n";
-
-        return false;
+        $this->dropColumn('{{%personnels}}', 'retirement_date');
     }
 
     /*
